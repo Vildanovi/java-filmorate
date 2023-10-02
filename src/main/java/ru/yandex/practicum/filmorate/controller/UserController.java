@@ -51,7 +51,7 @@ public class UserController {
         }
         validateUser(user);
         User updatedUser = users.get(userId);
-        updatedUser.setName(user.getEmail());
+        updatedUser.setEmail(user.getEmail());
         updatedUser.setLogin(user.getLogin());
         updatedUser.setName(user.getName());
         updatedUser.setBirthday(user.getBirthday());
