@@ -69,6 +69,7 @@ public class FilmController {
             throw new ValidationException("Продолжительность меньше 0: " + durationMinutes);
         }
     }
+
     public int getUniqueId() {
         return ++uniqueId;
     }
