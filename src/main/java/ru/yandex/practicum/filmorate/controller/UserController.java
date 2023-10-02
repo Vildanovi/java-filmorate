@@ -33,7 +33,8 @@ public class UserController {
         int id = getUniqueId();
         user.setId(id);
         validateUser(user);
-        if (user.getName().isEmpty()) {
+        String userName = user.getName();
+        if (userName == null) {
             user.setName(user.getLogin());
         }
         users.put(user.getId(), user);

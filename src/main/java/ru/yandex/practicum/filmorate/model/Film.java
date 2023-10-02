@@ -12,7 +12,7 @@ public class Film {
 
     private int id; // целочисленный идентификатор
     @NotNull @NotBlank private String name; // название
-    @Size(max=200) private String description; // описание
+    @Size(max = 200) private String description; // описание
     private LocalDate releaseDate; // дата релиза
     private int duration; // продолжительность фильма
 }
