@@ -58,14 +58,10 @@ public class FilmController {
         LocalDate minDate = LocalDate.of(1895, 12, 28);
         LocalDate releaseDate = film.getReleaseDate();
         int durationMinutes = film.getDuration();
-//        int descriptionLength = film.getDescription().length();
         LocalDate currentDate = LocalDate.now();
         if (releaseDate.isAfter(currentDate)) {
             throw new ValidationException("Дата релиза позже текущей: " + releaseDate);
         }
-//        if (descriptionLength > 200) {
-//            throw new ValidationException("Описание более 200 символов: " + descriptionLength);
-//        }
         if (releaseDate.isBefore(minDate)) {
             throw new ValidationException("Дата ранее 28 декабря 1895 года: " + releaseDate);
         }
@@ -73,7 +69,6 @@ public class FilmController {
             throw new ValidationException("Продолжительность меньше 0: " + durationMinutes);
         }
     }
-
     public int getUniqueId() {
         return ++uniqueId;
     }
