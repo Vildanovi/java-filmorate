@@ -38,8 +38,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film putFilm(@Valid @RequestBody Film film) throws ValidationException {
-        log.debug("Обновляем фильм {}", film);
+    public Film putFilm(@RequestBody Film film) throws ValidationException {
         int id = film.getId();
         if (!films.containsKey(id)) {
             throw new ValidationException("Фильм с указанным id не найден: " + id);
@@ -51,6 +50,7 @@ public class FilmController {
         updatedFilm.setReleaseDate(film.getReleaseDate());
         updatedFilm.setDuration(film.getDuration());
         films.put(id, updatedFilm);
+        log.debug("Обновляем фильм {}", film);
         return updatedFilm;
     }
 
