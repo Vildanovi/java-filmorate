@@ -30,9 +30,9 @@ public class UserController {
 
     @PostMapping
     public User postUser(@Valid @RequestBody User user) throws ValidationException {
+        validateUser(user);
         int id = getUniqueId();
         user.setId(id);
-        validateUser(user);
         String userName = user.getName();
         if (userName == null) {
             user.setName(user.getLogin());
@@ -45,11 +45,11 @@ public class UserController {
     @PutMapping
     public User putUser(@Valid @RequestBody User user) throws ValidationException {
         log.debug("Обновляем пользователя {}", user);
+        validateUser(user);
         int userId = user.getId();
         if (!users.containsKey(userId)) {
             throw new ValidationException("Пользователь с указанным login не найден: " + userId);
         }
-        validateUser(user);
         User updatedUser = users.get(userId);
         updatedUser.setEmail(user.getEmail());
         updatedUser.setLogin(user.getLogin());
