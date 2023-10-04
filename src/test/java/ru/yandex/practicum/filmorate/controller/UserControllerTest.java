@@ -8,12 +8,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -24,15 +29,19 @@ public class UserControllerTest extends UserController {
     HttpClient client;
     @Autowired
     private ObjectMapper objectMapper;
+    private Validator validator;
 
     @BeforeEach
     void beforeEach() {
         userController = new UserController();
         client = HttpClient.newHttpClient();
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
     @Test
-    public void getUsers() throws IOException, InterruptedException {
+    public void getUsersMap() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/users"))
@@ -40,6 +49,61 @@ public class UserControllerTest extends UserController {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    public void validationUserEmailUncorrected() {
+        User user = new User();
+        user.setLogin("dolore ullamco");
+        user.setName("");
+        user.setEmail("mail.ru");
+        user.setBirthday(LocalDate.of(1980,8,20));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size());
+    }
+
+    @Test
+    public void validationUserLoginEmpty() {
+        User user = new User();
+        user.setLogin("dolore ullamco");
+        user.setLogin("");
+        user.setEmail("yandex@mail.ru");
+        user.setBirthday(LocalDate.of(1980,8,20));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size());
+    }
+
+    @Test
+    public void validationUserEmailEmpty() {
+        User user = new User();
+        user.setLogin("login");
+        user.setName("Name");
+        user.setEmail("");
+        user.setBirthday(LocalDate.of(1980,8,20));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size());
+    }
+
+    @Test
+    public void validationUserEmailWhiteSpace() {
+        User user = new User();
+        user.setLogin("dolore ullamco");
+        user.setName("dolore");
+        user.setEmail("yandex@mail.ru");
+        user.setBirthday(LocalDate.of(1980,8,20));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size());
+    }
+
+    @Test
+    public void validationUserBirthday() {
+        User user = new User();
+        user.setLogin("Login");
+        user.setName("Name");
+        user.setEmail("yandex@mail.ru");
+        user.setBirthday(LocalDate.of(2025,10,5));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size());
     }
 
     @Test
@@ -75,6 +139,6 @@ public class UserControllerTest extends UserController {
         user2.setEmail("mail@yandex.ru");
         user2.setBirthday(LocalDate.of(1976,9,20));
         User updateUser = userController.putUser(user2);
-        assertEquals(userController.users.get(newUser.getId()), updateUser);
+        assertEquals(userController.getUsers().get(newUser.getId()), updateUser);
     }
 }

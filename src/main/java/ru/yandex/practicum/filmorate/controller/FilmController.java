@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -14,14 +14,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Data
+@Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
 
-    protected int uniqueId = 0;
-
-    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    public Map<Integer, Film> films = new HashMap<>();
+    private int uniqueId = 0;
+    private final Map<Integer, Film> films = new HashMap<>();
+    private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
 
     @GetMapping()
     public List<Film> getAllFilms() {
@@ -29,7 +30,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film postFilm(@Valid @RequestBody Film film) throws ValidationException {
+    public Film postFilm(@Valid @RequestBody Film film) {
         log.debug("Сохраняем фильм {}", film);
         film.setId(getUniqueId());
         validateFilm(film);
@@ -38,7 +39,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film putFilm(@RequestBody Film film) throws ValidationException {
+    public Film putFilm(@RequestBody Film film) {
         int id = film.getId();
         if (!films.containsKey(id)) {
             throw new ValidationException("Фильм с указанным id не найден: " + id);
@@ -49,28 +50,22 @@ public class FilmController {
         updatedFilm.setDescription(film.getDescription());
         updatedFilm.setReleaseDate(film.getReleaseDate());
         updatedFilm.setDuration(film.getDuration());
-        films.put(id, updatedFilm);
         log.debug("Обновляем фильм {}", film);
         return updatedFilm;
     }
 
-    private void validateFilm(Film film) throws ValidationException {
-        LocalDate minDate = LocalDate.of(1895, 12, 28);
+    private void validateFilm(Film film) {
         LocalDate releaseDate = film.getReleaseDate();
-        int durationMinutes = film.getDuration();
         LocalDate currentDate = LocalDate.now();
         if (releaseDate.isAfter(currentDate)) {
             throw new ValidationException("Дата релиза позже текущей: " + releaseDate);
         }
-        if (releaseDate.isBefore(minDate)) {
+        if (releaseDate.isBefore(MIN_DATE)) {
             throw new ValidationException("Дата ранее 28 декабря 1895 года: " + releaseDate);
-        }
-        if (durationMinutes < 0) {
-            throw new ValidationException("Продолжительность меньше 0: " + durationMinutes);
         }
     }
 
-    public int getUniqueId() {
+    private int getUniqueId() {
         return ++uniqueId;
     }
 }
