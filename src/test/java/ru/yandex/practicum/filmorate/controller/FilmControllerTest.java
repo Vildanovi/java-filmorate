@@ -52,6 +52,17 @@ public class FilmControllerTest extends FilmController {
     }
 
     @Test
+    public void validationFilmReleaseDate() {
+        Film film = new Film();
+        film.setName("Name");
+        film.setDescription("Description");
+        film.setReleaseDate(LocalDate.of(1894,10,25));
+        film.setDuration(200);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertEquals(1, violations.size());
+    }
+
+    @Test
     public void validationFilmDescription() {
         Film film = new Film();
         film.setName("Film name");

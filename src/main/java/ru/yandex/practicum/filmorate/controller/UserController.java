@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,11 +56,6 @@ public class UserController {
     }
 
     private void validateUser(User user) {
-        LocalDate birthdayDate = user.getBirthday();
-        LocalDate currentDate = LocalDate.now();
-        if (birthdayDate.isAfter(currentDate)) {
-            throw new ValidationException("Дата рождения позже текущей: " + birthdayDate);
-        }
         String userName = user.getName();
         if (userName == null || userName.isBlank()) {
             user.setName(user.getLogin());

@@ -33,7 +33,7 @@ public class FilmController {
     public Film postFilm(@Valid @RequestBody Film film) {
         log.debug("Сохраняем фильм {}", film);
         film.setId(getUniqueId());
-        validateFilm(film);
+//        validateFilm(film);
         films.put(film.getId(), film);
         return film;
     }
@@ -44,7 +44,7 @@ public class FilmController {
         if (!films.containsKey(id)) {
             throw new ValidationException("Фильм с указанным id не найден: " + id);
         }
-        validateFilm(film);
+//        validateFilm(film);
         Film updatedFilm = films.get(id);
         updatedFilm.setName(film.getName());
         updatedFilm.setDescription(film.getDescription());
@@ -54,16 +54,16 @@ public class FilmController {
         return updatedFilm;
     }
 
-    private void validateFilm(Film film) {
-        LocalDate releaseDate = film.getReleaseDate();
-        LocalDate currentDate = LocalDate.now();
-        if (releaseDate.isAfter(currentDate)) {
-            throw new ValidationException("Дата релиза позже текущей: " + releaseDate);
-        }
-        if (releaseDate.isBefore(MIN_DATE)) {
-            throw new ValidationException("Дата ранее 28 декабря 1895 года: " + releaseDate);
-        }
-    }
+//    private void validateFilm(Film film) {
+//        LocalDate releaseDate = film.getReleaseDate();
+//        LocalDate currentDate = LocalDate.now();
+//        if (releaseDate.isAfter(currentDate)) {
+//            throw new ValidationException("Дата релиза позже текущей: " + releaseDate);
+//        }
+//        if (releaseDate.isBefore(MIN_DATE)) {
+//            throw new ValidationException("Дата ранее 28 декабря 1895 года: " + releaseDate);
+//        }
+//    }
 
     private int getUniqueId() {
         return ++uniqueId;
