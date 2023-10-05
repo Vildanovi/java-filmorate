@@ -47,6 +47,9 @@ public class UserController {
             throw new ValidationException("Пользователь с указанным login не найден: " + userId);
         }
         User updatedUser = users.get(userId);
+        if (!user.getName().equals(user.getLogin())) {
+            updatedUser.setName(user.getName());
+        }
         updatedUser.setEmail(user.getEmail());
         updatedUser.setLogin(user.getLogin());
         updatedUser.setBirthday(user.getBirthday());
