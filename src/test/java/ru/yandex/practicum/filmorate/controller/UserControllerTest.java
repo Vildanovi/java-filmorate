@@ -54,7 +54,7 @@ public class UserControllerTest extends UserController {
     @Test
     public void validationUserEmailUncorrected() {
         User user = new User();
-        user.setLogin("dolore ullamco");
+        user.setLogin("Login");
         user.setName("");
         user.setEmail("mail.ru");
         user.setBirthday(LocalDate.of(1980,8,20));
@@ -119,8 +119,8 @@ public class UserControllerTest extends UserController {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            assertEquals(200, response.statusCode());
     }
 
     @Test

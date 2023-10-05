@@ -56,14 +56,12 @@ public class UserController {
     private void validateUser(User user) {
         LocalDate birthdayDate = user.getBirthday();
         LocalDate currentDate = LocalDate.now();
+        if (birthdayDate.isAfter(currentDate)) {
+            throw new ValidationException("Дата рождения позже текущей: " + birthdayDate);
+        }
         String userName = user.getName();
         if (userName == null || userName.isBlank()) {
             user.setName(user.getLogin());
-        } else {
-            users.get(user.getId()).setName(user.getName());
-        }
-        if (birthdayDate.isAfter(currentDate)) {
-            throw new ValidationException("Дата рождения позже текущей: " + birthdayDate);
         }
     }
 
