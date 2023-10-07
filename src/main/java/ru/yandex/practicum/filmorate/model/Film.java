@@ -16,7 +16,6 @@ public class Film {
     private String description; // описание
     @NotNull(message = "Дата релиза не может быть Null")
     @MinimumDate(message = "Дата релиза не может быть ранее 28 декабря 1895 года")
-    @PastOrPresent(message = "Дата релиза релиза не может быть позже текущей")
     private LocalDate releaseDate; // дата релиза
     @Positive(message = "Продолжительность не может быть меньше 0")
     private int duration; // продолжительность фильма
