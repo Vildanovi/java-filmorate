@@ -29,6 +29,13 @@ public class FilmController {
         return filmService.getFilms();
     }
 
+    @Operation(summary = "Получение фильма по id")
+    @GetMapping("/{id}")
+    public Film getFilm(@PathVariable ("id") int id) {
+        log.debug("Получаем пользователя с id: {}", id);
+        return filmService.getFilmById(id);
+    }
+
     @Operation(summary = "Добавление фильма")
     @PostMapping
     public Film postFilm(@Valid @RequestBody Film film) {
@@ -48,6 +55,13 @@ public class FilmController {
     public Film addLike(@PathVariable ("id") int id, @PathVariable ("userId") int userId) {
         log.debug("Ставим лайк фильму с id: {}", id);
         return filmService.addLike(id, userId);
+    }
+
+    @Operation(summary = "Пользователь удаляет лайк.")
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film deleteLike(@PathVariable ("id") int id, @PathVariable ("userId") int userId) {
+        log.debug("Удаляем лайк фильма с id: {}", id);
+        return filmService.deleteLike(id, userId);
     }
 
     @Operation(summary = "Возвращает список из первых count фильмов по количеству лайков. " +

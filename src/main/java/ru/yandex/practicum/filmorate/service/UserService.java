@@ -9,6 +9,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -56,7 +57,7 @@ public class UserService {
         int userId = user.getId();
         User updatedUser = inMemoryUserStorage.getUserByID(userId);
         if (updatedUser == null) {
-            throw new ValidationException("Пользователь с указанным login не найден: " + userId);
+            throw new UserNotFoundException("Пользователь с указанным login не найден: " + userId);
         }
         if (!user.getName().equals(user.getLogin())) {
             updatedUser.setName(user.getName());
@@ -76,8 +77,15 @@ public class UserService {
 
     public List<User> addToFriend(Integer userId, Integer friendId) {
         List<User> result = new ArrayList<>();
+
         User firstUser = inMemoryUserStorage.getUserByID(userId);
+        if (firstUser == null) {
+            throw new UserNotFoundException("Пользователь с указанным id не найден: " + userId);
+        }
         User secondUser = inMemoryUserStorage.getUserByID(friendId);
+        if (secondUser == null) {
+            throw new UserNotFoundException("Пользователь с указанным id не найден: " + friendId);
+        }
         result.add(firstUser);
         result.add(secondUser);
         firstUser.getFriends().add(friendId);
@@ -90,13 +98,13 @@ public class UserService {
         User firstUser = inMemoryUserStorage.getUserByID(userId);
         User secondUser = inMemoryUserStorage.getUserByID(friendId);
         if (firstUser == null && secondUser == null) {
-            throw new ValidationException("Пользователи с указанными id не найдены: " + userId + " " + friendId);
+            throw new UserNotFoundException("Пользователи с указанными id не найдены: " + userId + " " + friendId);
         }
         if (firstUser == null) {
-            throw new ValidationException("Пользователь с указанными id не найдены: " + userId);
+            throw new UserNotFoundException("Пользователь с указанными id не найдены: " + userId);
         }
         if (secondUser == null) {
-            throw new ValidationException("Пользователь с указанными id не найдены: " + friendId);
+            throw new UserNotFoundException("Пользователь с указанными id не найдены: " + friendId);
         }
         firstUser.getFriends().remove(friendId);
         secondUser.getFriends().remove(userId);
@@ -126,7 +134,11 @@ public class UserService {
     }
 
     public User getUserById(int id) {
-        return inMemoryUserStorage.getUserByID(id);
+        User result = inMemoryUserStorage.getUserByID(id);
+        if (result == null) {
+            throw new UserNotFoundException("Пользователь с указанным id не найден: " + id);
+        }
+        return result;
     }
 
     private int getUniqueId() {

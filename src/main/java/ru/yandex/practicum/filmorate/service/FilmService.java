@@ -8,7 +8,6 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
@@ -41,7 +40,7 @@ public class FilmService {
         int id = film.getId();
         Film updatedFilm = inMemoryFilmStorage.getFilmByID(id);
         if (updatedFilm == null) {
-            throw new ValidationException("Фильм с указанным id не найден: " + id);
+            throw new FilmNotFoundException("Фильм с указанным id не найден: " + id);
         }
         updatedFilm.setName(film.getName());
         updatedFilm.setDescription(film.getDescription());
@@ -59,6 +58,10 @@ public class FilmService {
     }
 
     public Film getFilmById(int id) {
+        Film result = inMemoryFilmStorage.getFilmByID(id);
+        if (result == null) {
+            throw new FilmNotFoundException("Фильм с указанным id не найден: " + id);
+        }
         return inMemoryFilmStorage.getFilmByID(id);
     }
 
@@ -66,6 +69,15 @@ public class FilmService {
         Film likedFilm = inMemoryFilmStorage.getFilmByID(filmId);
         likedFilm.getLikes().add(userId);
         return likedFilm;
+    }
+
+    public Film deleteLike(Integer filmId, Integer userId) {
+        Film result = inMemoryFilmStorage.getFilmByID(filmId);
+        if (result == null) {
+            throw new FilmNotFoundException("Фильм с указанным id не найден: " + filmId);
+        }
+        result.getLikes().remove(userId);
+        return result;
     }
 
     public List<Film> getPopular(int count) {

@@ -38,6 +38,13 @@ public class UserController {
         return userService.createUser(user);
     }
 
+    @Operation(summary = "Получение пользователя по id")
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable ("id") int id) {
+        log.debug("Получаем пользователя с id: {}", id);
+        return userService.getUserById(id);
+    }
+
     @Operation(summary = "Обновить параметры пользователя")
     @PutMapping
     public User putUser(@Valid @RequestBody User user) {
