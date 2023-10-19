@@ -14,7 +14,9 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -61,16 +63,18 @@ public class FilmService {
         return inMemoryFilmStorage.getFilmByID(id);
     }
 
-//    public List<User> addLike(Integer filmId, Integer userId) {
-//        List<User> result = new ArrayList<>();
-//        User firstUser = inMemoryUserStorage.getUserByID(userId);
-//        User secondUser = inMemoryUserStorage.getUserByID(friendId);
-//        result.add(firstUser);
-//        result.add(secondUser);
-//        firstUser.getFriends().add(friendId);
-//        secondUser.getFriends().add(userId);
-//        return result;
-//    }
+    public Film addLike(Integer filmId, Integer userId) {
+        Film likedFilm = inMemoryFilmStorage.getFilmByID(filmId);
+        likedFilm.getLikes().add(userId);
+        return likedFilm;
+    }
+
+    public List<Film> getPopular(int count) {
+        return inMemoryFilmStorage.getAll().stream()
+                .sorted(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()))
+                .limit(count)
+                .collect(Collectors.toList());
+    }
 
     private int getUniqueId() {
         return ++uniqueId;

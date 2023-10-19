@@ -64,10 +64,4 @@ public class UserController {
         log.debug("Ищем общих друзей для пользователей {}", userService.getUserById(id) + " " + userService.getUserById(otherId));
         return userService.getCommonFriends(id, otherId);
     }
-
-
-//    PUT /films/{id}/like/{userId} — пользователь ставит лайк фильму.
-//    GET /films/popular?count={count} — возвращает список из первых count
-//    фильмов по количеству лайков. Если значение параметра count не задано, верните первые 10.
-
 }
