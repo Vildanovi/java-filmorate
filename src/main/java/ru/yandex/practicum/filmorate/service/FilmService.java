@@ -8,6 +8,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
@@ -18,6 +19,7 @@ import java.util.List;
 public class FilmService {
 
     InMemoryFilmStorage inMemoryFilmStorage;
+    private int uniqueId = 0;
 
     @Autowired
     public FilmService(InMemoryFilmStorage inMemoryFilmStorage) {
@@ -28,21 +30,38 @@ public class FilmService {
         if (film == null) {
             throw new FilmNotFoundException("Необходимо передать параметры фильма");
         }
+        film.setId(getUniqueId());
         inMemoryFilmStorage.addFilm(film);
         return film;
     }
 
     public Film updateFilm(Film film) {
-        Film existFilm = inMemoryFilmStorage.getFilmByID(film.getId());
-        if (existFilm == null) {
-            throw new FilmNotFoundException("Необходимо передать параметры фильма");
+        int id = film.getId();
+        Film updatedFilm = inMemoryFilmStorage.getFilmByID(id);
+        if (updatedFilm == null) {
+            throw new ValidationException("Фильм с указанным id не найден: " + id);
         }
-        inMemoryFilmStorage.updateFilm(film);
+        updatedFilm.setName(film.getName());
+        updatedFilm.setDescription(film.getDescription());
+        updatedFilm.setReleaseDate(film.getReleaseDate());
+        updatedFilm.setDuration(film.getDuration());
         return film;
     }
 
     public List<Film> getFilms() {
         return new ArrayList<>(inMemoryFilmStorage.getAll());
+    }
+
+    public void deleteFilm(int id) {
+        inMemoryFilmStorage.removeFilm(id);
+    }
+
+    public Film getFilmById(int id) {
+        return inMemoryFilmStorage.getFilmByID(id);
+    }
+
+    private int getUniqueId() {
+        return ++uniqueId;
     }
 
 }

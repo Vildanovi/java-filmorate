@@ -6,15 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Slf4j
@@ -25,8 +20,8 @@ public class FilmController {
 
     private final FilmService filmService;
 
-    private int uniqueId = 0;
-    private final Map<Integer, Film> films = new HashMap<>();
+//    private int uniqueId = 0;
+//    private final Map<Integer, Film> films = new HashMap<>();
 //    private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
 
 //    @Autowired
@@ -37,7 +32,7 @@ public class FilmController {
     @Operation(summary = "Получить все фильмы")
     @GetMapping()
     public List<Film> getAllFilms() {
-        return new ArrayList<>(films.values());
+        return filmService.getFilms();
     }
 
     @Operation(summary = "Добавление фильма")
@@ -50,21 +45,8 @@ public class FilmController {
     @Operation(summary = "Обновление фильма")
     @PutMapping
     public Film putFilm(@RequestBody Film film) {
-        int id = film.getId();
-        if (!films.containsKey(id)) {
-            throw new ValidationException("Фильм с указанным id не найден: " + id);
-        }
-
-        Film updatedFilm = films.get(id);
-        updatedFilm.setName(film.getName());
-        updatedFilm.setDescription(film.getDescription());
-        updatedFilm.setReleaseDate(film.getReleaseDate());
-        updatedFilm.setDuration(film.getDuration());
+        Film updateFilm = filmService.updateFilm(film);
         log.debug("Обновляем фильм {}", film);
-        return updatedFilm;
-    }
-
-    private int getUniqueId() {
-        return ++uniqueId;
+        return updateFilm;
     }
 }
