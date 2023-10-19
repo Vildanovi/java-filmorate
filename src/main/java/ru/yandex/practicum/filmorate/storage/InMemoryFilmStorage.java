@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -12,7 +13,10 @@ import java.util.Map;
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Integer, Film> films = new HashMap<>();
-//    private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
+
+    @Autowired
+    public InMemoryFilmStorage() {
+    }
 
     @Override
     public void addFilm(Film film) {

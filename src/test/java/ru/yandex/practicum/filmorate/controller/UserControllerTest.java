@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -30,10 +31,16 @@ public class UserControllerTest extends UserController {
     @Autowired
     private ObjectMapper objectMapper;
     private Validator validator;
+    private UserService userService;
+
+    @Autowired
+    public UserControllerTest(UserService userService) {
+        super(userService);
+    }
 
     @BeforeEach
     void beforeEach() {
-        userController = new UserController();
+        userController = new UserControllerTest(userService);
         client = HttpClient.newHttpClient();
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -124,21 +131,35 @@ public class UserControllerTest extends UserController {
     }
 
     @Test
-    public void updateUser() throws ValidationException {
+    public void updateUser() throws ValidationException, IOException, InterruptedException {
         User user1 = new User();
         user1.setLogin("dolore");
         user1.setName("Nick Name");
-        user1.setEmail("mail@mail.ru");
+        user1.setEmail("mail2@mail.ru");
         user1.setBirthday(LocalDate.of(1946,8,20));
-        User newUser = userController.postUser(user1);
 
+        String json = objectMapper.writeValueAsString(user1);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode());
         User user2 = new User();
-        user2.setLogin("doloreUpdate");
-        user2.setName("est adipisicing");
         user2.setId(1);
-        user2.setEmail("mail@yandex.ru");
+        user2.setLogin("dolore2");
+        user2.setName("est adipisicing");
+        user2.setEmail("mail@ya.ru");
         user2.setBirthday(LocalDate.of(1976,9,20));
-        User updateUser = userController.putUser(user2);
-        assertEquals(userController.getUsers().get(newUser.getId()), updateUser);
+
+        String json2 = objectMapper.writeValueAsString(user2);
+        HttpRequest request2 = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/users"))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(json2))
+                .build();
+        HttpResponse<String> response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response2.statusCode());
     }
 }
