@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -20,15 +19,6 @@ import java.util.List;
 public class FilmController {
 
     private final FilmService filmService;
-
-//    private int uniqueId = 0;
-//    private final Map<Integer, Film> films = new HashMap<>();
-//    private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
-
-//    @Autowired
-//    public FilmController(FilmService filmService) {
-//        this.filmService = filmService;
-//    }
 
     @Operation(summary = "Получить все фильмы")
     @GetMapping()
