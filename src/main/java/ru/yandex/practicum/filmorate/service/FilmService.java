@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.util.ArrayList;
@@ -60,8 +61,18 @@ public class FilmService {
         return inMemoryFilmStorage.getFilmByID(id);
     }
 
+//    public List<User> addLike(Integer filmId, Integer userId) {
+//        List<User> result = new ArrayList<>();
+//        User firstUser = inMemoryUserStorage.getUserByID(userId);
+//        User secondUser = inMemoryUserStorage.getUserByID(friendId);
+//        result.add(firstUser);
+//        result.add(secondUser);
+//        firstUser.getFriends().add(friendId);
+//        secondUser.getFriends().add(userId);
+//        return result;
+//    }
+
     private int getUniqueId() {
         return ++uniqueId;
     }
-
 }

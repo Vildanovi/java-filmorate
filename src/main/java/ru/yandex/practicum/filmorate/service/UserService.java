@@ -13,10 +13,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -35,6 +32,7 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        log.debug("Создаем пользователя {}", user);
         String userEmail = user.getEmail();
         boolean checkEmail = false;
         for (User userCheck : inMemoryUserStorage.getAll()) {
@@ -49,7 +47,6 @@ public class UserService {
         validateUser(user);
         user.setId(getUniqueId());
         inMemoryUserStorage.addUser(user);
-        log.debug("Создаем пользователя {}", user);
         return user;
     }
 
@@ -77,14 +74,14 @@ public class UserService {
         }
     }
 
-    public List<User> addToFriend(int userId, int friendId) {
+    public List<User> addToFriend(Integer userId, Integer friendId) {
         List<User> result = new ArrayList<>();
         User firstUser = inMemoryUserStorage.getUserByID(userId);
         User secondUser = inMemoryUserStorage.getUserByID(friendId);
         result.add(firstUser);
         result.add(secondUser);
-        firstUser.setFriends(Collections.singleton(friendId));
-        secondUser.setFriends(Collections.singleton(userId));
+        firstUser.getFriends().add(friendId);
+        secondUser.getFriends().add(userId);
         return result;
     }
 
@@ -101,16 +98,8 @@ public class UserService {
         if (secondUser == null) {
             throw new ValidationException("Пользователь с указанными id не найдены: " + friendId);
         }
-        for (Integer friend : firstUser.getFriends()) {
-            if (friend == friendId) {
-                firstUser.getFriends().remove(friend);
-            }
-        }
-        for (Integer friend : secondUser.getFriends()) {
-            if (friend == userId) {
-                firstUser.getFriends().remove(userId);
-            }
-        }
+        firstUser.getFriends().remove(friendId);
+        secondUser.getFriends().remove(userId);
         result.add(firstUser);
         result.add(secondUser);
         return result;
@@ -120,8 +109,20 @@ public class UserService {
         return inMemoryUserStorage.getAllFriendsById(id);
     }
 
-    public List<User> getCommonFriends() {
-        return null;
+    public List<User> getCommonFriends(int id, int otherId) {
+        List<User> result = new ArrayList<>();
+        Set<Integer> userFirst = inMemoryUserStorage.getUserByID(id).getFriends();
+        Set<Integer> userSecond = inMemoryUserStorage.getUserByID(otherId).getFriends();
+        boolean haveCommon = userFirst.containsAll(userSecond);
+        if (haveCommon) {
+            return result;
+        }
+        Set<Integer> common = new HashSet<>(userFirst);
+        common.retainAll(userSecond);
+        for (Integer friend : common) {
+            result.add(inMemoryUserStorage.getUserByID(friend));
+        }
+        return result;
     }
 
     public User getUserById(int id) {
