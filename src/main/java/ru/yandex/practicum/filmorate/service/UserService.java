@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UserUnknownException;
+import ru.yandex.practicum.filmorate.exceptions.UserUpdateException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -57,7 +58,7 @@ public class UserService {
         int userId = user.getId();
         User updatedUser = inMemoryUserStorage.getUserByID(userId);
         if (updatedUser == null) {
-            throw new UserNotFoundException("Пользователь с указанным login не найден: " + userId);
+            throw new UserUpdateException("Пользователь не существует: " + user);
         }
         validateUser(user);
         if (!user.getName().equals(user.getLogin())) {
