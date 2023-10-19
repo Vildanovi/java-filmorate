@@ -8,8 +8,10 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.UserUnknownException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,11 +22,13 @@ import java.util.stream.Collectors;
 public class FilmService {
 
     InMemoryFilmStorage inMemoryFilmStorage;
+    InMemoryUserStorage inMemoryUserStorage;
     private int uniqueId = 0;
 
     @Autowired
-    public FilmService(InMemoryFilmStorage inMemoryFilmStorage) {
+    public FilmService(InMemoryFilmStorage inMemoryFilmStorage, InMemoryUserStorage inMemoryUserStorage) {
         this.inMemoryFilmStorage = inMemoryFilmStorage;
+        this.inMemoryUserStorage = inMemoryUserStorage;
     }
 
     public Film createFilm(Film film) {
@@ -75,6 +79,9 @@ public class FilmService {
         Film result = inMemoryFilmStorage.getFilmByID(filmId);
         if (result == null) {
             throw new FilmNotFoundException("Фильм с указанным id не найден: " + filmId);
+        }
+        if (inMemoryUserStorage.getUserByID(userId) == null) {
+            throw new UserUnknownException("Пользователь с указанным id не существует: " + userId);
         }
         result.getLikes().remove(userId);
         return result;

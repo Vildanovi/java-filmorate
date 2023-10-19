@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.UserUnknownException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -53,12 +54,12 @@ public class UserService {
 
     public User putUser(User user) {
         log.debug("Обновляем пользователя {}", user);
-        validateUser(user);
         int userId = user.getId();
         User updatedUser = inMemoryUserStorage.getUserByID(userId);
         if (updatedUser == null) {
             throw new UserNotFoundException("Пользователь с указанным login не найден: " + userId);
         }
+        validateUser(user);
         if (!user.getName().equals(user.getLogin())) {
             updatedUser.setName(user.getName());
         }
@@ -80,11 +81,11 @@ public class UserService {
 
         User firstUser = inMemoryUserStorage.getUserByID(userId);
         if (firstUser == null) {
-            throw new UserNotFoundException("Пользователь с указанным id не найден: " + userId);
+            throw new UserUnknownException("Пользователь с указанным id не существует: " + userId);
         }
         User secondUser = inMemoryUserStorage.getUserByID(friendId);
         if (secondUser == null) {
-            throw new UserNotFoundException("Пользователь с указанным id не найден: " + friendId);
+            throw new UserUnknownException("Пользователь с указанным id не существует: " + friendId);
         }
         result.add(firstUser);
         result.add(secondUser);
@@ -119,12 +120,18 @@ public class UserService {
 
     public List<User> getCommonFriends(int id, int otherId) {
         List<User> result = new ArrayList<>();
+        if (inMemoryUserStorage.getUserByID(id) == null) {
+            throw new UserUnknownException("Пользователь с указанным id не существует: " + id);
+        }
+        if (inMemoryUserStorage.getUserByID(otherId) == null) {
+            throw new UserUnknownException("Пользователь с указанным id не существует: " + otherId);
+        }
         Set<Integer> userFirst = inMemoryUserStorage.getUserByID(id).getFriends();
         Set<Integer> userSecond = inMemoryUserStorage.getUserByID(otherId).getFriends();
-        boolean haveCommon = userFirst.containsAll(userSecond);
-        if (haveCommon) {
-            return result;
-        }
+//        boolean haveCommon = userFirst.containsAll(userSecond);
+//        if (haveCommon) {
+//            return result;
+//        }
         Set<Integer> common = new HashSet<>(userFirst);
         common.retainAll(userSecond);
         for (Integer friend : common) {
@@ -136,7 +143,7 @@ public class UserService {
     public User getUserById(int id) {
         User result = inMemoryUserStorage.getUserByID(id);
         if (result == null) {
-            throw new UserNotFoundException("Пользователь с указанным id не найден: " + id);
+            throw new UserUnknownException("Пользователь с указанным id не найден: " + id);
         }
         return result;
     }
