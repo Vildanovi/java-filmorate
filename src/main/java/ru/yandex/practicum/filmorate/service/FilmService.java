@@ -1,17 +1,13 @@
 package ru.yandex.practicum.filmorate.service;
 
-//Создайте FilmService, который будет отвечать за операции с фильмами,
-// — добавление и удаление лайка, вывод 10 наиболее популярных
-// фильмов по количеству лайков. Пусть пока каждый пользователь
-// может поставить лайк фильму только один раз.
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.UserUnknownException;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,21 +17,19 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
 
-    InMemoryFilmStorage inMemoryFilmStorage;
-    InMemoryUserStorage inMemoryUserStorage;
-    private int uniqueId = 0;
+    private final FilmStorage inMemoryFilmStorage;
+    private final UserStorage inMemoryUserStorage;
 
     @Autowired
-    public FilmService(InMemoryFilmStorage inMemoryFilmStorage, InMemoryUserStorage inMemoryUserStorage) {
+    public FilmService(FilmStorage inMemoryFilmStorage, UserStorage inMemoryUserStorage) {
         this.inMemoryFilmStorage = inMemoryFilmStorage;
         this.inMemoryUserStorage = inMemoryUserStorage;
     }
 
     public Film createFilm(Film film) {
         if (film == null) {
-            throw new FilmNotFoundException("Необходимо передать параметры фильма");
+            throw new EntityNotFoundException("Необходимо передать параметры фильма");
         }
-        film.setId(getUniqueId());
         inMemoryFilmStorage.addFilm(film);
         return film;
     }
@@ -44,7 +38,7 @@ public class FilmService {
         int id = film.getId();
         Film updatedFilm = inMemoryFilmStorage.getFilmByID(id);
         if (updatedFilm == null) {
-            throw new FilmNotFoundException("Фильм с указанным id не найден: " + id);
+            throw new EntityNotFoundException("Фильм с указанным id не найден: " + id);
         }
         updatedFilm.setName(film.getName());
         updatedFilm.setDescription(film.getDescription());
@@ -64,7 +58,7 @@ public class FilmService {
     public Film getFilmById(int id) {
         Film result = inMemoryFilmStorage.getFilmByID(id);
         if (result == null) {
-            throw new FilmNotFoundException("Фильм с указанным id не найден: " + id);
+            throw new EntityNotFoundException("Фильм с указанным id не найден: " + id);
         }
         return inMemoryFilmStorage.getFilmByID(id);
     }
@@ -78,10 +72,10 @@ public class FilmService {
     public Film deleteLike(Integer filmId, Integer userId) {
         Film result = inMemoryFilmStorage.getFilmByID(filmId);
         if (result == null) {
-            throw new FilmNotFoundException("Фильм с указанным id не найден: " + filmId);
+            throw new EntityNotFoundException("Фильм с указанным id не найден: " + filmId);
         }
         if (inMemoryUserStorage.getUserByID(userId) == null) {
-            throw new UserUnknownException("Пользователь с указанным id не существует: " + userId);
+            throw new EntityNotFoundException("Пользователь с указанным id не существует: " + userId);
         }
         result.getLikes().remove(userId);
         return result;
@@ -92,9 +86,5 @@ public class FilmService {
                 .sorted(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()))
                 .limit(count)
                 .collect(Collectors.toList());
-    }
-
-    private int getUniqueId() {
-        return ++uniqueId;
     }
 }

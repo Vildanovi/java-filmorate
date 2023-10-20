@@ -5,10 +5,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationBadRequestException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -17,12 +21,7 @@ import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.Set;
 
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.Validation;
-import javax.validation.ConstraintViolation;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class FilmControllerTest extends FilmController {
@@ -121,7 +120,7 @@ public class FilmControllerTest extends FilmController {
     }
 
     @Test
-    public void updateFilm() throws ValidationException, IOException, InterruptedException {
+    public void updateFilm() throws ValidationBadRequestException, IOException, InterruptedException {
         Film film1 = new Film();
         film1.setName("name");
         film1.setDescription("adipisicing");

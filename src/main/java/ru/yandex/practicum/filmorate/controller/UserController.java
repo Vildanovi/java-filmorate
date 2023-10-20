@@ -60,21 +60,21 @@ public class UserController {
     @Operation(summary = "Добавление в друзья")
     @PutMapping("/{id}/friends/{friendId}")
     public List<User> addFriends(@PathVariable ("id") int id, @PathVariable ("friendId") int friendId) {
-        log.debug("Добавляем пользователей в друзья {}", id + " " + friendId);
+        log.debug("Добавляем в друзья. Мой id = {}, друг friendId = {}", id, friendId);
         return userService.addToFriend(id, friendId);
     }
 
     @Operation(summary = "Удаление из друзей")
     @DeleteMapping("/{id}/friends/{friendId}")
     public List<User> deleteFriends(@PathVariable ("id") int id, @PathVariable ("friendId") int friendId) {
-        log.debug("Добавляем пользователей в друзья {}", userService.getUserById(id) + " " + userService.getUserById(friendId));
+        log.debug("Удаляем из друзей. Мой id = {}, друг friendId = {}", id, friendId);
         return userService.deleteFromFriend(id, friendId);
     }
 
     @Operation(summary = "Cписок друзей, общих с другим пользователем.")
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> findCommonFriends(@PathVariable ("id") int id, @PathVariable ("otherId") int  otherId) {
-        log.debug("Ищем общих друзей для пользователей {}", userService.getUserById(id) + " " + userService.getUserById(otherId));
+        log.debug("Ищем общих друзей. Мой id = {}, пользователь otherId = {}", id, otherId);
         return userService.getCommonFriends(id, otherId);
     }
 }

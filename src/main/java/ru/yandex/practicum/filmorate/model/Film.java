@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-//@SuperBuilder
 public class Film {
 
     private int id; // целочисленный идентификатор

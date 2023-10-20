@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationBadRequestException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -131,7 +131,7 @@ public class UserControllerTest extends UserController {
     }
 
     @Test
-    public void updateUser() throws ValidationException, IOException, InterruptedException {
+    public void updateUser() throws ValidationBadRequestException, IOException, InterruptedException {
         User user1 = new User();
         user1.setLogin("dolore");
         user1.setName("Nick Name");

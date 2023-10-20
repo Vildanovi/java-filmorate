@@ -3,15 +3,14 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
     private final Map<Integer, User> users = new HashMap<>();
+    private int uniqueId = 0;
 
     @Autowired
     public InMemoryUserStorage() {
@@ -19,6 +18,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void addUser(User user) {
+        user.setId(getUniqueId());
         users.put(user.getId(), user);
     }
 
@@ -37,11 +37,17 @@ public class InMemoryUserStorage implements UserStorage {
         return new ArrayList<>(users.values());
     }
 
+//    @Override
+//    public Optional<User> getUserByID(int id) {
+//        return Optional.of(users.get(id));
+//    }
+
     @Override
     public User getUserByID(int id) {
         return users.get(id);
     }
 
+    @Override
     public List<User> getAllFriendsById(int id) {
         List<User> list = new ArrayList<>();
         for (Integer userFriendId : users.get(id).getFriends()) {
@@ -49,5 +55,9 @@ public class InMemoryUserStorage implements UserStorage {
             list.add(user);
         }
         return list;
+    }
+
+    private int getUniqueId() {
+        return ++uniqueId;
     }
 }

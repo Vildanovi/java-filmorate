@@ -2,26 +2,30 @@ package ru.yandex.practicum.filmorate.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Data
 @Slf4j
 @RestController
 @RequestMapping("/films")
+@RequiredArgsConstructor
 public class FilmController {
 
     private final FilmService filmService;
 
-    @Autowired
-    public FilmController(FilmService filmService) {
-        this.filmService = filmService;
-    }
+//    @Autowired
+//    public FilmController(FilmService filmService) {
+//        this.filmService = filmService;
+//    }
 
     @Operation(summary = "Получить все фильмы")
     @GetMapping()
@@ -67,7 +71,8 @@ public class FilmController {
     @Operation(summary = "Возвращает список из первых count фильмов по количеству лайков. " +
             "Если значение параметра count не задано, верните первые 10.")
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
+//    @Validated
+    public List<Film> getPopularFilms(@RequestParam(value = "count", defaultValue = "10") Integer count) {
         log.debug("Возвращаем популярные фильмы в количестве: {}", count);
         return filmService.getPopular(count);
     }

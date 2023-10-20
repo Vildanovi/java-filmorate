@@ -3,8 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 public class ErrorResponse {
 
-    String error;
-//    String description;
+    private String error;
 
     public ErrorResponse(String error) {
         this.error = error;
@@ -13,8 +12,4 @@ public class ErrorResponse {
     public String getError() {
         return error;
     }
-
-//    public String getDescription() {
-//        return description;
-//    }
 }
