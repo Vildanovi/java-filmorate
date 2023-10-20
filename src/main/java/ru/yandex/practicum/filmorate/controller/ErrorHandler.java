@@ -40,7 +40,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handlerUserUnknownUpdateException(final UserUpdateException exception) {
         log.info("Пользователь не существует {}", exception.getMessage());
         return new ErrorResponse(exception.getMessage());
