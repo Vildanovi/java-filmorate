@@ -1,14 +1,11 @@
 package ru.yandex.practicum.filmorate.service;
 
-
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-
 import java.util.*;
 
 @Slf4j
@@ -47,9 +44,17 @@ public class UserService {
     public User putUser(User user) {
         log.debug("Обновляем пользователя {}", user);
         int userId = user.getId();
-        User updatedUser = inMemoryUserStorage.getUserByID(userId);
-        if (updatedUser == null) {
-            throw new UserUpdateException("Пользователь не существует: " + user);
+        User updatedUser = inMemoryUserStorage.getUserByID(userId).orElseThrow(() -> new UserUpdateException("Пользователь не существует: " + user));
+        String userEmail = user.getEmail();
+        boolean checkEmail = false;
+        for (User userCheck : inMemoryUserStorage.getAll()) {
+            if (userCheck.getEmail().equals(userEmail)) {
+                checkEmail = true;
+                break;
+            }
+        }
+        if (checkEmail) {
+            throw new ValidationBadRequestException("Пользователь с указанным email уже существует: " + userEmail);
         }
         validateUser(user);
         if (!user.getName().equals(user.getLogin())) {
@@ -71,14 +76,10 @@ public class UserService {
     public List<User> addToFriend(Integer userId, Integer friendId) {
         List<User> result = new ArrayList<>();
 
-        User firstUser = inMemoryUserStorage.getUserByID(userId);
-        if (firstUser == null) {
-            throw new EntityNotFoundException("Пользователь с указанным id не существует: " + userId);
-        }
-        User secondUser = inMemoryUserStorage.getUserByID(friendId);
-        if (secondUser == null) {
-            throw new EntityNotFoundException("Пользователь с указанным id не существует: " + friendId);
-        }
+        User firstUser = inMemoryUserStorage.getUserByID(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не существует: " + userId));
+        User secondUser = inMemoryUserStorage.getUserByID(friendId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не существует: " + friendId));
         result.add(firstUser);
         result.add(secondUser);
         firstUser.getFriends().add(friendId);
@@ -88,17 +89,10 @@ public class UserService {
 
     public List<User> deleteFromFriend(int userId, int friendId) {
         List<User> result = new ArrayList<>();
-        User firstUser = inMemoryUserStorage.getUserByID(userId);
-        User secondUser = inMemoryUserStorage.getUserByID(friendId);
-        if (firstUser == null && secondUser == null) {
-            throw new ValidationBadRequestException("Пользователи с указанными id не найдены: " + userId + " " + friendId);
-        }
-        if (firstUser == null) {
-            throw new ValidationBadRequestException("Пользователь с указанными id не найдены: " + userId);
-        }
-        if (secondUser == null) {
-            throw new ValidationBadRequestException("Пользователь с указанными id не найдены: " + friendId);
-        }
+        User firstUser = inMemoryUserStorage.getUserByID(userId)
+                .orElseThrow(() -> new ValidationBadRequestException("Пользователи с указанными id не найдены: " + userId));
+        User secondUser = inMemoryUserStorage.getUserByID(friendId)
+                .orElseThrow(() -> new ValidationBadRequestException("Пользователь с указанными id не найдены: " + friendId));
         firstUser.getFriends().remove(friendId);
         secondUser.getFriends().remove(userId);
         result.add(firstUser);
@@ -112,27 +106,21 @@ public class UserService {
 
     public List<User> getCommonFriends(int id, int otherId) {
         List<User> result = new ArrayList<>();
-        if (inMemoryUserStorage.getUserByID(id) == null) {
-            throw new EntityNotFoundException("Пользователь с указанным id не существует: " + id);
-        }
-        if (inMemoryUserStorage.getUserByID(otherId) == null) {
-            throw new EntityNotFoundException("Пользователь с указанным id не существует: " + otherId);
-        }
-        Set<Integer> userFirst = inMemoryUserStorage.getUserByID(id).getFriends();
-        Set<Integer> userSecond = inMemoryUserStorage.getUserByID(otherId).getFriends();
+        Set<Integer> userFirst = inMemoryUserStorage.getUserByID(id)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не существует: " + id)).getFriends();
+        Set<Integer> userSecond = inMemoryUserStorage.getUserByID(otherId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не существует: " + otherId)).getFriends();
         Set<Integer> common = new HashSet<>(userFirst);
         common.retainAll(userSecond);
-        for (Integer friend : common) {
-            result.add(inMemoryUserStorage.getUserByID(friend));
+        for (Integer userId : common) {
+            result.add(inMemoryUserStorage.getUserByID(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не существует: " + userId)));
         }
         return result;
     }
 
     public User getUserById(int id) {
-        User result = inMemoryUserStorage.getUserByID(id);
-        if (result == null) {
-            throw new EntityNotFoundException("Пользователь с указанным id не найден: " + id);
-        }
-        return result;
+        return inMemoryUserStorage.getUserByID(id)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не найден: " + id));
     }
 }

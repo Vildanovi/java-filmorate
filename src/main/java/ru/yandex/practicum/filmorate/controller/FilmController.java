@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -18,14 +17,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
+@Validated
 public class FilmController {
 
     private final FilmService filmService;
-
-//    @Autowired
-//    public FilmController(FilmService filmService) {
-//        this.filmService = filmService;
-//    }
 
     @Operation(summary = "Получить все фильмы")
     @GetMapping()
@@ -71,8 +66,7 @@ public class FilmController {
     @Operation(summary = "Возвращает список из первых count фильмов по количеству лайков. " +
             "Если значение параметра count не задано, верните первые 10.")
     @GetMapping("/popular")
-//    @Validated
-    public List<Film> getPopularFilms(@RequestParam(value = "count", defaultValue = "10") Integer count) {
+    public List<Film> getPopularFilms(@RequestParam(value = "count", defaultValue = "10") @Positive Integer count) {
         log.debug("Возвращаем популярные фильмы в количестве: {}", count);
         return filmService.getPopular(count);
     }

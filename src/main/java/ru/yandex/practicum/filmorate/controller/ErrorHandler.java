@@ -35,11 +35,11 @@ public class ErrorHandler {
         return new ErrorResponse(exception.getMessage());
     }
 
-//    @ExceptionHandler
-//    public ResponseEntity<String> validationCountException(ConstraintViolationException exception) {
-//        log.debug("Некорректный запрос со статусом 400 {}", exception.getMessage(), exception);
-//        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
-//    }
+    @ExceptionHandler
+    public ResponseEntity<String> validationCountException(ConstraintViolationException exception) {
+        log.debug("Некорректный запрос со статусом 400 {}", exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

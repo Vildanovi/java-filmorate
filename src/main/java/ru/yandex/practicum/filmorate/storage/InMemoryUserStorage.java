@@ -37,15 +37,15 @@ public class InMemoryUserStorage implements UserStorage {
         return new ArrayList<>(users.values());
     }
 
-//    @Override
-//    public Optional<User> getUserByID(int id) {
-//        return Optional.of(users.get(id));
-//    }
-
     @Override
-    public User getUserByID(int id) {
-        return users.get(id);
+    public Optional<User> getUserByID(int id) {
+        return Optional.of(users.get(id));
     }
+
+//    @Override
+//    public User getUserByID(int id) {
+//        return users.get(id);
+//    }
 
     @Override
     public List<User> getAllFriendsById(int id) {
