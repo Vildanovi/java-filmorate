@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.ArrayList;
@@ -68,13 +69,11 @@ public class FilmService {
 
     public Film deleteLike(Integer filmId, Integer userId) {
         Film result = inMemoryFilmStorage.getFilmByID(filmId);
+        User user = inMemoryUserStorage.getUserByID(userId).orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не существует: " + userId));
         if (result == null) {
             throw new EntityNotFoundException("Фильм с указанным id не найден: " + filmId);
         }
-        if (inMemoryUserStorage.getUserByID(userId) == null) {
-            throw new EntityNotFoundException("Пользователь с указанным id не существует: " + userId);
-        }
-        result.getLikes().remove(userId);
+        result.getLikes().remove(user.getId());
         return result;
     }
 
