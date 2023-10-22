@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -12,7 +11,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
-@Data
 @Slf4j
 @RestController
 @RequestMapping("/films")

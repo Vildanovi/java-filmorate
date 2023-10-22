@@ -34,10 +34,9 @@ public class FilmService {
 
     public Film updateFilm(Film film) {
         int id = film.getId();
-        Film updatedFilm = inMemoryFilmStorage.getFilmByID(id);
-        if (updatedFilm == null) {
-            throw new EntityNotFoundException("Фильм с указанным id не найден: " + id);
-        }
+//        Film updatedFilm = inMemoryFilmStorage.getFilmByID(id)
+//                .orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + id));
+        Film updatedFilm = getFilmById(film.getId());
         updatedFilm.setName(film.getName());
         updatedFilm.setDescription(film.getDescription());
         updatedFilm.setReleaseDate(film.getReleaseDate());
@@ -54,25 +53,24 @@ public class FilmService {
     }
 
     public Film getFilmById(int id) {
-        Film result = inMemoryFilmStorage.getFilmByID(id);
-        if (result == null) {
-            throw new EntityNotFoundException("Фильм с указанным id не найден: " + id);
-        }
-        return inMemoryFilmStorage.getFilmByID(id);
+        return inMemoryFilmStorage.getFilmByID(id)
+                .orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + id));
     }
 
     public Film addLike(Integer filmId, Integer userId) {
-        Film likedFilm = inMemoryFilmStorage.getFilmByID(filmId);
+//        Film likedFilm = inMemoryFilmStorage.getFilmByID(filmId)
+//                .orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + filmId));
+        Film likedFilm = getFilmById(filmId);
         likedFilm.getLikes().add(userId);
         return likedFilm;
     }
 
     public Film deleteLike(Integer filmId, Integer userId) {
-        Film result = inMemoryFilmStorage.getFilmByID(filmId);
-        User user = inMemoryUserStorage.getUserByID(userId).orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не существует: " + userId));
-        if (result == null) {
-            throw new EntityNotFoundException("Фильм с указанным id не найден: " + filmId);
-        }
+//        Film result = inMemoryFilmStorage.getFilmByID(filmId)
+//                .orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + filmId));
+        Film result = getFilmById(filmId);
+        User user = inMemoryUserStorage.getUserByID(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не существует: " + userId));
         result.getLikes().remove(user.getId());
         return result;
     }
