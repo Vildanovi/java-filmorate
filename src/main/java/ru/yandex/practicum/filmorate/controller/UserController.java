@@ -1,68 +1,73 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.Data;
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-
+import ru.yandex.practicum.filmorate.service.UserService;
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@Data
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
-    private int uniqueId = 0;
-    private final Map<Integer, User> users = new HashMap<>();
+    private final UserService userService;
 
+    @Operation(summary = "Получить всех пользователей")
     @GetMapping()
     public List<User> getAllUsers() {
-        return new ArrayList<>(users.values());
+        return new ArrayList<>(userService.getAllUsers());
     }
 
+    @Operation(summary = "Добавить пользователя")
     @PostMapping
     public User postUser(@Valid @RequestBody User user) {
-        validateUser(user);
-        int id = getUniqueId();
-        user.setId(id);
-        users.put(user.getId(), user);
         log.debug("Создаем пользователя {}", user);
-        return user;
+        return userService.createUser(user);
     }
 
+    @Operation(summary = "Получение пользователя по id")
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable ("id") int id) {
+        log.debug("Получаем пользователя с id: {}", id);
+        return userService.getUserById(id);
+    }
+
+    @Operation(summary = "Обновить параметры пользователя")
     @PutMapping
     public User putUser(@Valid @RequestBody User user) {
-        log.debug("Обновляем пользователя {}", user);
-        validateUser(user);
-        int userId = user.getId();
-        if (!users.containsKey(userId)) {
-            throw new ValidationException("Пользователь с указанным login не найден: " + userId);
-        }
-        User updatedUser = users.get(userId);
-        if (!user.getName().equals(user.getLogin())) {
-            updatedUser.setName(user.getName());
-        }
-        updatedUser.setEmail(user.getEmail());
-        updatedUser.setLogin(user.getLogin());
-        updatedUser.setBirthday(user.getBirthday());
-        return updatedUser;
+        return userService.putUser(user);
     }
 
-    private void validateUser(User user) {
-        String userName = user.getName();
-        if (userName == null || userName.isBlank()) {
-            user.setName(user.getLogin());
-        }
+    @Operation(summary = "Возвращаем список пользователей, являющихся его друзьями")
+    @GetMapping("/{id}/friends")
+    public List<User> getUserFriendsById(@PathVariable ("id") int id) {
+        return userService.getUserFriends(id);
     }
 
-    private int getUniqueId() {
-        return ++uniqueId;
+    @Operation(summary = "Добавление в друзья")
+    @PutMapping("/{id}/friends/{friendId}")
+    public List<User> addFriends(@PathVariable ("id") int id, @PathVariable ("friendId") int friendId) {
+        log.debug("Добавляем в друзья. Мой id = {}, друг friendId = {}", id, friendId);
+        return userService.addToFriend(id, friendId);
+    }
+
+    @Operation(summary = "Удаление из друзей")
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public List<User> deleteFriends(@PathVariable ("id") int id, @PathVariable ("friendId") int friendId) {
+        log.debug("Удаляем из друзей. Мой id = {}, друг friendId = {}", id, friendId);
+        return userService.deleteFromFriend(id, friendId);
+    }
+
+    @Operation(summary = "Cписок друзей, общих с другим пользователем.")
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> findCommonFriends(@PathVariable ("id") int id, @PathVariable ("otherId") int  otherId) {
+        log.debug("Ищем общих друзей. Мой id = {}, пользователь otherId = {}", id, otherId);
+        return userService.getCommonFriends(id, otherId);
     }
 }
