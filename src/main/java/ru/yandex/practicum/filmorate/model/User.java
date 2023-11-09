@@ -1,14 +1,18 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class User {
 
     private int id; // целочисленный идентификатор
@@ -24,4 +28,7 @@ public class User {
     private LocalDate birthday;// дата рождения — birthday
     @JsonIgnore
     private Set<Integer> friends = new HashSet<>(); //id друзей
+
+//    private LocalDateTime createdDate; // Дата создания пользователя
+//    private LocalDateTime lastUpdates; // Дата обновления пользователя
 }

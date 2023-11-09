@@ -21,7 +21,7 @@ public class UserController {
     @Operation(summary = "Получить всех пользователей")
     @GetMapping()
     public List<User> getAllUsers() {
-        return new ArrayList<>(userService.getAllUsers());
+        return new ArrayList<>(userService.getAllUsersDb());
     }
 
     @Operation(summary = "Добавить пользователя")

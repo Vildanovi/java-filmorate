@@ -5,6 +5,7 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.interfaces.MinimumDate;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,4 +24,8 @@ public class Film {
     private int duration; // продолжительность фильма
     @JsonIgnore
     private Set<Integer> likes = new HashSet<>(); //id пользователей кто поставил лайк
+    private int ratingMpa; //Возрастной рейтинг контента
+//    private LocalDateTime createdDate; // Дата создания фильма
+//    private LocalDateTime lastUpdates; // Дата обновления фильма
+    private Set<Integer> filmGenre = new HashSet<>(); // id жанров
 }

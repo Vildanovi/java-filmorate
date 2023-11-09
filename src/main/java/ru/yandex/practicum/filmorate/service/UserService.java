@@ -2,10 +2,13 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.impl.UserDbStorage;
+
 import java.util.*;
 
 @Slf4j
@@ -13,15 +16,23 @@ import java.util.*;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final UserDbStorage userDbStorage;
 
     @Autowired
-    public UserService(UserStorage inMemoryUserStorage) {
+    public UserService(@Qualifier("InMemoryUserStorage") UserStorage inMemoryUserStorage, @Qualifier("UserDbStorage") UserDbStorage userDbStorage) {
         this.userStorage = inMemoryUserStorage;
+        this.userDbStorage = userDbStorage;
     }
+
 
     public List<User> getAllUsers() {
         return userStorage.getAll();
     }
+
+    public List<User> getAllUsersDb() {
+        return userDbStorage.getAll();
+    }
+
 
     public User createUser(User user) {
         log.debug("Создаем пользователя {}", user);
@@ -29,9 +40,19 @@ public class UserService {
             throw new ValidationBadRequestException("Пользователь с указанным email уже существует: " + user.getEmail());
         }
         validateUser(user);
-        userStorage.addUser(user);
+        userDbStorage.addUser(user);
         return user;
     }
+
+//    public User createUser(User user) {
+//        log.debug("Создаем пользователя {}", user);
+//        if (isThereEmail(user)) {
+//            throw new ValidationBadRequestException("Пользователь с указанным email уже существует: " + user.getEmail());
+//        }
+//        validateUser(user);
+//        userStorage.addUser(user);
+//        return user;
+//    }
 
     public User putUser(User user) {
         log.debug("Обновляем пользователя {}", user);
