@@ -36,3 +36,9 @@ VALUES (1, 'G', 'У фильма нет возрастных ограничен�
 --                WHERE f.user1_id = 1) AS p
 --               ON f2.user1_id = p.user2_id
 -- WHERE f2.user2_id = 1;
+
+
+SELECT f1.user2_id
+FROM user_friends AS f1
+         INNER JOIN user_friends AS f2 ON f1.user2_id = f2.user2_id
+WHERE f1.user1_id = 1 AND f2.user1_id = 4;

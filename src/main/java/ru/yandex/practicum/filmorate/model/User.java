@@ -13,6 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class User {
 
     private int id; // целочисленный идентификатор
@@ -26,9 +27,8 @@ public class User {
     @NotNull (message = "Дата рождения не может быть пустым")
     @PastOrPresent (message = "Дата рождения не может быть позже текущей")
     private LocalDate birthday;// дата рождения — birthday
-    @JsonIgnore
+//    @JsonIgnore
     private Set<Integer> friends = new HashSet<>(); //id друзей
-
 //    private LocalDateTime createdDate; // Дата создания пользователя
 //    private LocalDateTime lastUpdates; // Дата обновления пользователя
 }
