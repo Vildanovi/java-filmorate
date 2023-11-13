@@ -5,7 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.UserFriends;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -16,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component("UserDbStorage")
+@Qualifier("UserDbStorage")
 public class UserDbStorage implements UserStorage {
 
     private final Logger log = LoggerFactory.getLogger(UserDbStorage.class);
@@ -75,7 +79,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> getUserByID(int id) {
+    public Optional<User> getUserByID(int id){
         String sqlQuery = "select * from USERS where id = ?";
         User user = jdbcTemplate.queryForObject(sqlQuery, this::makeUser, id);
         if(user != null) {
@@ -139,14 +143,25 @@ public class UserDbStorage implements UserStorage {
     }
 
     public List<User> getCommonFriends(Integer userId, Integer friendId){
-        String sqlCommon = "SELECT f1.id, f1.user1_id, f1.user2_id, f1.initiator_id " +
+        SqlRowSet sqlCommon = jdbcTemplate.queryForRowSet("SELECT f1.user2_id " +
                 "FROM user_friends AS f1 " +
                 "INNER JOIN user_friends AS f2 ON f1.user2_id = f2.user2_id " +
-                "WHERE f1.user1_id = ? AND f2.user1_id = ?;";
-        List<User> commonUsers = jdbcTemplate.query(sqlCommon, (this::makeUser), userId, friendId);
-        if(commonUsers.isEmpty()) {
-            return Collections.emptyList();
+                "WHERE f1.user1_id = ? AND f2.user1_id = ?;", userId, friendId);
+        List<User> filmPopular = new ArrayList<>();
+        while (sqlCommon.next()) {
+            int id = sqlCommon.getInt("user2_id");
+            filmPopular.add(getUserByID(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + id)));
         }
-        return commonUsers;
+        return filmPopular;
+//        String sqlCommon = "SELECT f1.id, f1.user1_id, f1.user2_id, f1.initiator_id " +
+//                "FROM user_friends AS f1 " +
+//                "INNER JOIN user_friends AS f2 ON f1.user2_id = f2.user2_id " +
+//                "WHERE f1.user1_id = ? AND f2.user1_id = ?;";
+//        List<User> commonUsers = jdbcTemplate.query(sqlCommon, (this::makeUser), userId, friendId);
+//        if(commonUsers.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//        return commonUsers;
     }
 }

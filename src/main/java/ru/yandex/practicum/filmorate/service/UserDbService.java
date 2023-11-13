@@ -34,26 +34,25 @@ public class UserDbService {
         validateUser(user);
         user.setId(getUniqueId());
         userDbStorage.addUser(user);
-        //Добавление друзей
-//        user.setFriends(userDbStorage.getUserFriends(user.getId()));
         return user;
     }
 
     public User putUserDb(User user) {
         log.debug("Обновляем пользователя {}", user);
         int userId = user.getId();
-        Optional<User> updatedUser = userDbStorage.getUserByID(userId);
+        User updatedUser = userDbStorage.getUserByID(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не найден:"));
         if (isThereEmailDb(user)) {
-            throw new ValidationBadRequestException("Пользователь с указанным email уже существует: " + user.getEmail());
+            throw new UserUpdateException("Пользователь с указанным email уже существует: " + user.getEmail());
         }
         validateUser(user);
         if (!user.getName().equals(user.getLogin())) {
             user.setName(user.getName());
         }
-        if(updatedUser.isPresent()) {
+        if(updatedUser != null) {
             userDbStorage.updateUser(user);
         } else {
-            throw new ValidationBadRequestException("Пользователь с указанным id не найден: " + userId);
+            throw new EntityNotFoundException("Пользователь с указанным id не найден: " + userId);
         }
         return user;
     }
@@ -68,10 +67,10 @@ public class UserDbService {
                 userDbStorage.addToFriend(userId, friendId);
                 result.add(getUserByIdDb(friendId));
             } else {
-                throw new ValidationBadRequestException("Пользователь с указанным id не найден: " + friendId);
+                throw new EntityNotFoundException("Пользователь с указанным id не найден: " + friendId);
             }
         } else {
-            throw new ValidationBadRequestException("Пользователь с указанным id не найден: " + userId);
+            throw new EntityNotFoundException("Пользователь с указанным id не найден: " + userId);
         }
         return result;
     }
@@ -93,10 +92,10 @@ public class UserDbService {
                 result.add(getUserByIdDb(friendId));
                 userDbStorage.deleteFriend(userId, friendId);
             } else {
-                throw new ValidationBadRequestException("Пользователь с указанным id не найден: " + friendId);
+                throw new EntityNotFoundException("Пользователь с указанным id не найден: " + friendId);
             }
         } else {
-            throw new ValidationBadRequestException("Пользователь с указанным id не найден: " + userId);
+            throw new EntityNotFoundException("Пользователь с указанным id не найден: " + userId);
         }
         return result;
     }
@@ -120,10 +119,10 @@ public class UserDbService {
             if(friend.isPresent()) {
                 result = userDbStorage.getCommonFriends(id, otherId);
             } else {
-                throw new ValidationBadRequestException("Пользователь с указанным id не найден: " + otherId);
+                throw new EntityNotFoundException("Пользователь с указанным id не найден: " + otherId);
             }
         } else {
-            throw new ValidationBadRequestException("Пользователь с указанным id не найден: " + id);
+            throw new EntityNotFoundException("Пользователь с указанным id не найден: " + id);
         }
         return result;
     }

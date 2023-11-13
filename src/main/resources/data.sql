@@ -5,12 +5,12 @@ INSERT INTO genre(id, name)
 -- VALUES ('Неподтверждённая'),
 --        ('Подтверждённая');
 
-INSERT INTO film_mpa_rating(id, name, description)
-VALUES (1, 'G', 'У фильма нет возрастных ограничений'),
-       (2, 'PG', 'Детям рекомендуется смотреть фильм с родителями'),
-       (3, 'PG-13', 'Детям до 13 лет просмотр не желателен'),
-       (4, 'R', 'Лицам до 17 лет просматривать фильм можно только в присутствии взрослого'),
-       (5, 'NC-17', 'Лицам до 18 лет просмотр запрещён');
+INSERT INTO film_mpa_rating(id, name)
+VALUES (1, 'G'),
+       (2, 'PG'),
+       (3, 'PG-13'),
+       (4, 'R'),
+       (5, 'NC-17');
 
 
 -- INSERT INTO users(id, email, login, name, birthday)
@@ -38,7 +38,8 @@ VALUES (1, 'G', 'У фильма нет возрастных ограничен�
 -- WHERE f2.user2_id = 1;
 
 
-SELECT f1.user2_id
-FROM user_friends AS f1
-         INNER JOIN user_friends AS f2 ON f1.user2_id = f2.user2_id
-WHERE f1.user1_id = 1 AND f2.user1_id = 4;
+-- SELECT f1.user2_id
+-- FROM user_friends AS f1
+--          INNER JOIN user_friends AS f2 ON f1.user2_id = f2.user2_id
+-- WHERE f1.user1_id = 1 AND f2.user1_id = 4;
+

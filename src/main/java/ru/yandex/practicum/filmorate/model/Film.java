@@ -22,7 +22,7 @@ public class Film {
     private LocalDate releaseDate; // дата релиза
     @Positive(message = "Продолжительность не может быть меньше 0")
     private int duration; // продолжительность фильма
-    @JsonIgnore
+//    @JsonIgnore
     private Set<Integer> likes = new HashSet<>(); //id пользователей кто поставил лайк
     private int ratingMpa; //Возрастной рейтинг контента
 //    private LocalDateTime createdDate; // Дата создания фильма

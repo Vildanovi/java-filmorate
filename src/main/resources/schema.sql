@@ -1,8 +1,8 @@
 CREATE TABLE if not exists film_mpa_rating
 (
     id          int not null PRIMARY KEY,
-    name        varchar(10),
-    description varchar(255)
+    name        varchar(10)
+--     description varchar(255)
 );
 
 CREATE TABLE if not exists genre
@@ -13,7 +13,7 @@ CREATE TABLE if not exists genre
 
 CREATE TABLE if not exists films
 (
-    id            int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    id            int PRIMARY KEY NOT NULL,
     name          varchar(50)     NOT NULL,
     description   varchar(200),
     release_date  date            NOT NULL,
