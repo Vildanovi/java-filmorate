@@ -1,34 +1,20 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.UserFriends;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
-    private final Logger log = LoggerFactory.getLogger(UserDbStorage.class);
     private final JdbcTemplate jdbcTemplate;
-
-//    @Autowired
-//    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-//        this.jdbcTemplate = jdbcTemplate;
-//    }
 
     @Override
     public void addUser(User user) {
@@ -68,17 +54,10 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> getUserByID(int id){
+    public Optional<User> getUserByID(int id) {
         String sqlQuery = "select * from USERS where id = ?";
         return Optional.of(jdbcTemplate.query(sqlQuery, this::makeUser, id).stream().findAny())
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не найден: " + id));
-//        if(user.isPresent()) {
-//            log.info("Найден пользователь: {} {}", user.getId(), user.getName());
-//            return user;
-//        } else {
-//            log.info("Пользователь с идентификатором {} не найден", id);
-//            return Optional.empty();
-//        }
     }
 
     @Override

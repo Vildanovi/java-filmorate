@@ -60,7 +60,7 @@ public class FilmDbService {
         log.debug("Обновляем фильм {}", film);
         int filmId = film.getId();
         Optional<Film> updatedFilm = filmDbStorage.getFilmByID(filmId);
-        if(updatedFilm.isPresent()) {
+        if (updatedFilm.isPresent()) {
             genreStorage.deleteGenres(filmId);
             filmDbStorage.updateFilm(film);
         } else {
@@ -75,10 +75,10 @@ public class FilmDbService {
             int id = film.getId();
             FilmMpaRating mpa = mpaStorage.getMpaByFilmId(id);
             Set<Genre> genres = genreStorage.getFilmGenre(id);
-            if(mpa != null) {
+            if (mpa != null) {
                 film.setMpa(mpa);
             }
-            if(genres != null) {
+            if (genres != null) {
                 film.setGenres(genres);
             }
         }
@@ -90,10 +90,10 @@ public class FilmDbService {
                 .orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + id));
         FilmMpaRating mpa = mpaStorage.getMpaByFilmId(id);
         Set<Genre> genres = genreStorage.getFilmGenre(id);
-        if(mpa != null) {
+        if (mpa != null) {
             film.setMpa(mpa);
         }
-        if(genres != null) {
+        if (genres != null) {
             film.setGenres(genres);
         }
         return film;
@@ -116,7 +116,7 @@ public class FilmDbService {
     public List<Film> getPopular(int count) {
         log.debug("Получаем {} популярных фильмов", count);
         List<Film> popularFilms = filmDbStorage.getAll();
-        if(popularFilms != null) {
+        if (popularFilms != null) {
             return filmDbStorage.getPopular(count);
         } else {
             throw new ValidationBadRequestException("Список фильмов пуст");

@@ -52,7 +52,7 @@ public class UserDbService {
         if (!user.getName().equals(user.getLogin())) {
             user.setName(user.getName());
         }
-        if(updatedUser != null) {
+        if (updatedUser != null) {
             userDbStorage.updateUser(user);
         } else {
             throw new EntityNotFoundException("Пользователь с указанным id не найден: " + userId);
@@ -60,7 +60,7 @@ public class UserDbService {
         return user;
     }
 
-    public User removeUserByIdDB(int id){
+    public User removeUserByIdDB(int id) {
         User user = userDbStorage.getUserByID(id)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не найден: " + id));
         userDbStorage.removeUser(id);

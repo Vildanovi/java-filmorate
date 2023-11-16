@@ -41,7 +41,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDuration(),
                 film.getMpa().getId()
         );
-        if(film.getGenres() != null) {
+        if (film.getGenres() != null) {
             genreStorage.addGenre(film);
         }
         return getFilmByID(film.getId())
@@ -65,7 +65,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa().getId(),
                 film.getId()
         );
-        if(film.getGenres() != null) {
+        if (film.getGenres() != null) {
             genreStorage.addGenre(film);
         }
         return getFilmByID(film.getId())

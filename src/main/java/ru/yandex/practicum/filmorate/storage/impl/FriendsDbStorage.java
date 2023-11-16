@@ -41,7 +41,7 @@ public class FriendsDbStorage implements FriendsStorage {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
-        if(friends.isEmpty()) {
+        if (friends.isEmpty()) {
             return Collections.emptyList();
         }
         return friends;
@@ -56,7 +56,7 @@ public class FriendsDbStorage implements FriendsStorage {
         Set<Integer> friends = userFriends.stream()
                 .map(UserFriends::getUser1Id)
                 .collect(Collectors.toSet());
-        if(friends.isEmpty()) {
+        if (friends.isEmpty()) {
             return Collections.emptySet();
         }
         return friends;
