@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.*;
 
+@Deprecated
 @Slf4j
 @Service
 public class UserService {
@@ -16,8 +17,8 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(@Qualifier("InMemoryUserStorage") UserStorage inMemoryUserStorage) {
-        this.userStorage = inMemoryUserStorage;
+    public UserService(@Qualifier("inMemoryUserStorage") UserStorage storage) {
+        this.userStorage = storage;
     }
 
     public List<User> getAllUsers() {

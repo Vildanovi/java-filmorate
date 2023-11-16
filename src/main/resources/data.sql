@@ -1,11 +1,11 @@
-INSERT INTO genre(id, name)
+merge INTO genre(id, name)
     VALUES (1, 'Комедия'), (2, 'Драма'), (3, 'Мультфильм'), (4, 'Триллер'), (5, 'Документальный'), (6, 'Боевик');
 
 -- INSERT INTO friends_status(name)
 -- VALUES ('Неподтверждённая'),
 --        ('Подтверждённая');
 
-INSERT INTO film_mpa_rating(id, name)
+merge INTO film_mpa_rating(id, name)
 VALUES (1, 'G'),
        (2, 'PG'),
        (3, 'PG-13'),

@@ -2,10 +2,10 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.*;
 
+@Deprecated
 @Component("InMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
 
@@ -42,27 +42,17 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Optional<Film> addLike(int filmId, int userId) {
-        return Optional.empty();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Optional<Film> deleteLike(int filmId, int userId) {
-        return Optional.empty();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Film> getPopular(int count) {
-        return null;
-    }
-
-    @Override
-    public List<Genre> getAllGenre() {
-        return null;
-    }
-
-    @Override
-    public Optional<Genre> getGenreByID(int id) {
-        return Optional.empty();
+        throw new UnsupportedOperationException();
     }
 
     private int getUniqueId() {

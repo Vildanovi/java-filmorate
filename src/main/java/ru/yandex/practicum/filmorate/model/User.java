@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -9,8 +10,8 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 @Getter
 @Setter
 @Builder
@@ -29,6 +30,4 @@ public class User {
     private LocalDate birthday;// дата рождения — birthday
 //    @JsonIgnore
     private Set<Integer> friends = new HashSet<>(); //id друзей
-//    private LocalDateTime createdDate; // Дата создания пользователя
-//    private LocalDateTime lastUpdates; // Дата обновления пользователя
 }

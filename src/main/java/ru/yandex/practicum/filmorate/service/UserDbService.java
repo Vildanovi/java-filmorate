@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
@@ -16,10 +17,12 @@ public class UserDbService {
 
     private int uniqueId = 0;
     private final UserStorage userDbStorage;
+    private final FriendsStorage friendsStorage;
 
     @Autowired
-    public UserDbService(@Qualifier("UserDbStorage") UserStorage userStorage) {
+    public UserDbService(@Qualifier("userDbStorage") UserStorage userStorage, FriendsStorage friendsStorage) {
         this.userDbStorage = userStorage;
+        this.friendsStorage = friendsStorage;
     }
 
     public List<User> getAllUsersDb() {
@@ -57,24 +60,6 @@ public class UserDbService {
         return user;
     }
 
-    public List<User> addToFriendDb(Integer userId, Integer friendId) {
-        List<User> result = new ArrayList<>();
-        Optional<User> askFriendship = Optional.ofNullable(getUserByIdDb(userId));
-        Optional<User> friend = Optional.ofNullable(getUserByIdDb(friendId));
-        if(askFriendship.isPresent()) {
-            result.add(getUserByIdDb(userId));
-            if(friend.isPresent()) {
-                userDbStorage.addToFriend(userId, friendId);
-                result.add(getUserByIdDb(friendId));
-            } else {
-                throw new EntityNotFoundException("Пользователь с указанным id не найден: " + friendId);
-            }
-        } else {
-            throw new EntityNotFoundException("Пользователь с указанным id не найден: " + userId);
-        }
-        return result;
-    }
-
     public User removeUserByIdDB(int id){
         User user = userDbStorage.getUserByID(id)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не найден: " + id));
@@ -82,49 +67,30 @@ public class UserDbService {
         return user;
     }
 
-    public List<User> deleteFromFriendDb(int userId, int friendId) {
+    public List<User> addToFriendDb(Integer userId, Integer friendId) {
         List<User> result = new ArrayList<>();
-        Optional<User> askFriendship = Optional.ofNullable(getUserByIdDb(userId));
-        Optional<User> friend = Optional.ofNullable(getUserByIdDb(friendId));
-        if(askFriendship.isPresent()) {
-            result.add(getUserByIdDb(userId));
-            if(friend.isPresent()) {
-                result.add(getUserByIdDb(friendId));
-                userDbStorage.deleteFriend(userId, friendId);
-            } else {
-                throw new EntityNotFoundException("Пользователь с указанным id не найден: " + friendId);
-            }
-        } else {
-            throw new EntityNotFoundException("Пользователь с указанным id не найден: " + userId);
-        }
+        result.add(getUserByIdDb(userId));
+        result.add(getUserByIdDb(friendId));
+        friendsStorage.addToFriend(userId, friendId);
         return result;
     }
 
-    private void validateUser(User user) {
-        String userName = user.getName();
-        if (userName == null || userName.isBlank()) {
-            user.setName(user.getLogin());
-        }
+    public List<User> deleteFromFriendDb(int userId, int friendId) {
+        List<User> result = new ArrayList<>();
+        result.add(getUserByIdDb(userId));
+        result.add(getUserByIdDb(friendId));
+        friendsStorage.deleteFriend(userId, friendId);
+        return result;
     }
 
     public List<User> getUserFriendsDb(int id) {
-        return userDbStorage.getAllFriendsById(id);
+        return friendsStorage.getAllFriendsById(id);
     }
 
     public List<User> getCommonFriendsDb(int id, int otherId) {
-        List<User> result = new ArrayList<>();
-        Optional<User> askFriendship = Optional.ofNullable(getUserByIdDb(id));
-        Optional<User> friend = Optional.ofNullable(getUserByIdDb(otherId));
-        if(askFriendship.isPresent()) {
-            if(friend.isPresent()) {
-                result = userDbStorage.getCommonFriends(id, otherId);
-            } else {
-                throw new EntityNotFoundException("Пользователь с указанным id не найден: " + otherId);
-            }
-        } else {
-            throw new EntityNotFoundException("Пользователь с указанным id не найден: " + id);
-        }
-        return result;
+        getUserByIdDb(id);
+        getUserByIdDb(otherId);
+        return new ArrayList<>(friendsStorage.getCommonFriends(id, otherId));
     }
 
     public User getUserByIdDb(int id) {
@@ -133,16 +99,23 @@ public class UserDbService {
     }
 
     public Boolean isThereEmailDb(User user) {
-        String userEmail = user.getEmail();
+        String email = user.getEmail();
         int userId = user.getId();
         boolean checkEmail = false;
         for (User userCheck : userDbStorage.getAll()) {
-            if (userCheck.getEmail().equals(userEmail) && (userCheck.getId() != userId)) {
+            if (userCheck.getEmail().equals(email) && (userCheck.getId() != userId)) {
                 checkEmail = true;
                 break;
             }
         }
         return checkEmail;
+    }
+
+    private void validateUser(User user) {
+        String userName = user.getName();
+        if (userName == null || userName.isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 
     private int getUniqueId() {

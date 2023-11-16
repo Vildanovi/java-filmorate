@@ -1,20 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.Size;
 
 @Getter
 @Setter
+@Builder
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FilmMpaRating {
 
     private int id; // Идентификатор
     @Size(max = 10)
     private String name; // Название рейтинга
-//    @Size(max = 255)
-//    private String description; // Описание возрастного рейтинга
 
     public FilmMpaRating(int id, String name) {
         this.id = id;
