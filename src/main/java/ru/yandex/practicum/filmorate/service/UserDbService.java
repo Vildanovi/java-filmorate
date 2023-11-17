@@ -121,5 +121,4 @@ public class UserDbService {
     private int getUniqueId() {
         return ++uniqueId;
     }
-
 }

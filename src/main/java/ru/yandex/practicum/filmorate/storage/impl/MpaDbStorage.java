@@ -58,27 +58,4 @@ public class MpaDbStorage implements MpaStorage {
                 filmId
         );
     }
-
-
-//    @Override
-//    public List<FilmMpaRating> getAllRatingMpa() {
-//        List<FilmMpaRating> allMpa = new ArrayList<>();
-//        SqlRowSet mpaSql = jdbcTemplate.queryForRowSet("SELECT * FROM FILM_MPA_RATING");
-//        while (mpaSql.next()) {
-//            FilmMpaRating mpa = new FilmMpaRating(mpaSql.getInt("id"), mpaSql.getString("name"));
-//            allMpa.add(mpa);
-//        }
-//        return allMpa;
-//    }
-//
-//    @Override
-//    public Optional<FilmMpaRating> getMpaById(int id) {
-//        SqlRowSet mpaByIdSql = jdbcTemplate.queryForRowSet("SELECT * FROM FILM_MPA_RATING WHERE ID = ?", id);
-//        if (mpaByIdSql.next()) {
-//            return Optional.of(new FilmMpaRating(mpaByIdSql.getInt("id"), mpaByIdSql.getString("name")));
-//        } else {
-//            throw new EntityNotFoundException("Список фильмов пуст");
-//        }
-//    }
-
 }

@@ -53,16 +53,8 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public Set<Genre> getFilmGenre(int id) {
-//        SqlRowSet filmGenreSql = jdbcTemplate.queryForRowSet("select * from film_genre where film_id = ?", id);
-//        List<Genre> filmGenre = new ArrayList<>();
-//        while (filmGenreSql.next()) {
-//            filmGenre.add(filmGenreSql.getObject("genre_id", Genre.class));
-//        }
-//        return filmGenre;
-//        String genresFilm = "select * from film_genre where film_id = ?";
         String genresFilm = "select * from GENRE JOIN film_genre ON genre_id = GENRE.ID where film_genre.FILM_ID = ?";
         return new HashSet<>(jdbcTemplate.query(genresFilm, GenreDbStorage::makeGenre, id));
-//        return jdbcTemplate.query(genresFilm, GenreDbStorage::makeGenre, id);
     }
 
     @Override

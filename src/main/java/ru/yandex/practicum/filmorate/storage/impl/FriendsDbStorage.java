@@ -89,15 +89,6 @@ public class FriendsDbStorage implements FriendsStorage {
                     .orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + id)));
         }
         return commonUsers;
-//        String sqlCommon = "SELECT f1.id, f1.user1_id, f1.user2_id, f1.initiator_id " +
-//                "FROM user_friends AS f1 " +
-//                "INNER JOIN user_friends AS f2 ON f1.user2_id = f2.user2_id " +
-//                "WHERE f1.user1_id = ? AND f2.user1_id = ?;";
-//        List<User> commonUsers = jdbcTemplate.query(sqlCommon, (this::makeUser), userId, friendId);
-//        if(commonUsers.isEmpty()) {
-//            return Collections.emptyList();
-//        }
-//        return commonUsers;
     }
 
     public UserFriends makeFriends(ResultSet rs) throws SQLException {

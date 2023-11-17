@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.interfaces.MinimumDate;
@@ -21,8 +22,10 @@ public class Film {
     private LocalDate releaseDate; // дата релиза
     @Positive(message = "Продолжительность не может быть меньше 0")
     private int duration; // продолжительность фильма
-//    @JsonIgnore
+    @JsonIgnore
     private Set<Integer> likes = new HashSet<>(); //id пользователей кто поставил лайк
+    @JsonIgnore
     private FilmMpaRating mpa; //Возрастной рейтинг контента
+    @JsonIgnore
     private Set<Genre> genres = new HashSet<>(); // id жанров
 }

@@ -1,17 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
-@SuperBuilder
+@Builder
 @Getter
 @Setter
-@Builder
 public class User {
 
     private int id; // целочисленный идентификатор

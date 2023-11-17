@@ -24,11 +24,6 @@ public class FilmDbStorage implements FilmStorage {
     private final MpaDbStorage mpaDbStorage;
     private final GenreStorage genreStorage;
 
-//    @Autowired
-//    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
-//        this.jdbcTemplate = jdbcTemplate;
-//    }
-
     @Override
     public Film addFilm(Film film) {
         String userAddSql = "insert into FILMS(ID, NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING_MPA_ID) " +
@@ -83,14 +78,6 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "select * from FILMS where id = ?";
         return Optional.ofNullable(jdbcTemplate.query(sqlQuery, this::makeFilm, id).stream().findAny()
                 .orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + id)));
-//        Film film = jdbcTemplate.queryForObject(sqlQuery, this::makeFilm, id);
-//        if(film != null) {
-//            log.info("Найден фильм: {} {}", film.getId(), film.getName());
-//            return Optional.of(film);
-//        } else {
-//            log.info("Фильм с идентификатором {} не найден", id);
-//            return Optional.empty();
-//        }
     }
 
     @Override
@@ -125,31 +112,9 @@ public class FilmDbStorage implements FilmStorage {
                 .mpa(mpaDbStorage.getMpaById(rs.getInt("rating_mpa_id")))
                 .genres(genreStorage.getFilmGenre(rs.getInt("id")))
                 .build();
-
-//        Film film = new Film();
-//        film.setId(rs.getInt("id"));
-//        film.setName(rs.getString("name"));
-//        film.setDescription(rs.getString("description"));
-//        film.setReleaseDate(rs.getDate("release_date").toLocalDate());
-//        film.setDuration(rs.getInt("duration"));
-//        film.setLikes(getLikesById(rs.getInt("id")));
-
-//        film.setMpa(resultSet.getObject("film_mpa_rating", FilmMpaRating.class));
-//        film.setMpa(getMpaByFilmId(resultSet.getInt("id")));
-//        film.setGenres(getFilmGenre(resultSet.getInt("id")));
     }
 
-//    public FilmMpaRating getMpaByFilmId(int id) {
-//        SqlRowSet filmMpaSql = jdbcTemplate.queryForRowSet("select rating_mpa_id from FILMS where id = ?", id);
-//        if (filmMpaSql.next()) {
-//            getMpaById(filmMpaSql.getInt("rating_mpa_id"));
-//        }
-//        return null;
-//    }
-
     public List<Film> getPopular(int count) {
-//        String popularFilms = "SELECT film_id, COUNT(user_id) FROM user_film_likes GROUP BY film_id ORDER BY COUNT(user_id) DESC LIMIT ?";
-
           String topFilms = "SELECT id, name, description, release_date, duration, rating_mpa_id  \n" +
                   "FROM films \n" +
                   "LEFT JOIN user_film_likes likes\n" +
@@ -157,24 +122,7 @@ public class FilmDbStorage implements FilmStorage {
                   "GROUP BY id\n" +
                   "ORDER BY COUNT(likes.user_id) DESC\n" +
                   "LIMIT ?";
-//        String topFilms = "SELECT id, name, description, release_date, duration, rating_mpa_id " +
-//                "FROM films " +
-//                "LEFT JOIN (SELECT film_id FROM user_film_likes GROUP BY film_id ORDER BY COUNT(user_id) DESC) as rate ON films.id = rate.film_id LIMIT ?";
         return jdbcTemplate.query(topFilms, this::makeFilm, count);
-
-//        SqlRowSet filmPopularSql = jdbcTemplate.queryForRowSet("SELECT film_id, " +
-//                "COUNT(user_id) " +
-//                "FROM user_film_likes " +
-//                "GROUP BY film_id " +
-//                "ORDER BY COUNT(user_id) DESC " +
-//                "LIMIT ?;", count);
-//        List<Film> filmPopular = new ArrayList<>();
-//        while (filmPopularSql.next()) {
-//            int filmId = filmPopularSql.getInt("film_id");
-//            filmPopular.add(getFilmByID(filmId)
-//                    .orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + filmId)));
-//        }
-//        return filmPopular;
     }
 
     public Set<Integer> getLikesById(int id) {
