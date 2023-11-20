@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -17,16 +18,18 @@ public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void addUser(User user) {
-            String userAddSql = "insert into users(id, email, login, name, birthday) " +
-                    "values (?, ?, ?, ?, ?)";
-            jdbcTemplate.update(userAddSql,
-                    user.getId(),
-                    user.getEmail(),
-                    user.getLogin(),
-                    user.getName(),
-                    user.getBirthday()
-            );
+    public User addUser(User user) {
+        Map<String, Object> keys = new SimpleJdbcInsert(this.jdbcTemplate)
+                .withTableName("users")
+                .usingColumns("email", "login", "name", "birthday")
+                .usingGeneratedKeyColumns("id")
+                .executeAndReturnKeyHolder(Map.of("email", user.getEmail(),
+                        "login", user.getLogin(),
+                        "name", user.getName(),
+                        "birthday", user.getBirthday()))
+                .getKeys();
+        user.setId((Integer) keys.get("ID"));
+            return user;
     }
 
     @Override

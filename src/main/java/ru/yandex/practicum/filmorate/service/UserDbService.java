@@ -2,25 +2,25 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserFriends;
 import ru.yandex.practicum.filmorate.storage.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class UserDbService {
 
-    private int uniqueId = 0;
     private final UserStorage userDbStorage;
     private final FriendsStorage friendsStorage;
 
     @Autowired
-    public UserDbService(@Qualifier("userDbStorage") UserStorage userStorage, FriendsStorage friendsStorage) {
+    public UserDbService(UserStorage userStorage, FriendsStorage friendsStorage) {
         this.userDbStorage = userStorage;
         this.friendsStorage = friendsStorage;
     }
@@ -35,9 +35,7 @@ public class UserDbService {
             throw new ValidationBadRequestException("Пользователь с указанным email уже существует: " + user.getEmail());
         }
         validateUser(user);
-        user.setId(getUniqueId());
-        userDbStorage.addUser(user);
-        return user;
+        return userDbStorage.addUser(user);
     }
 
     public User putUserDb(User user) {
@@ -84,13 +82,32 @@ public class UserDbService {
     }
 
     public List<User> getUserFriendsDb(int id) {
-        return friendsStorage.getAllFriendsById(id);
+        List<UserFriends> userFriends = friendsStorage.getAllFriendsById(id);
+        List<User> friends = userFriends.stream()
+                .map(UserFriends::getUser2Id)
+                .map(userDbStorage::getUserByID)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        if (friends.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return friends;
     }
 
     public List<User> getCommonFriendsDb(int id, int otherId) {
         getUserByIdDb(id);
         getUserByIdDb(otherId);
-        return new ArrayList<>(friendsStorage.getCommonFriends(id, otherId));
+        List<Integer> commonUsersId = friendsStorage.getCommonFriends(id, otherId);
+        List<User> commonUsers = commonUsersId.stream()
+                .map(userDbStorage::getUserByID)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        if (commonUsers.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return commonUsers;
     }
 
     public User getUserByIdDb(int id) {
@@ -116,9 +133,5 @@ public class UserDbService {
         if (userName == null || userName.isBlank()) {
             user.setName(user.getLogin());
         }
-    }
-
-    private int getUniqueId() {
-        return ++uniqueId;
     }
 }

@@ -13,7 +13,7 @@ public interface GenreStorage {
 
     Optional<Genre> getGenreByID(int id);
 
-    public void addGenre(Film film);
+    void addGenre(Film film);
 
     Set<Genre> getFilmGenre(int id);
 

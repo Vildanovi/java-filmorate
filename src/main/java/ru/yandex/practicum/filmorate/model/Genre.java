@@ -11,7 +11,6 @@ import javax.validation.constraints.Size;
 @Setter
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Genre {
 
     @EqualsAndHashCode.Include

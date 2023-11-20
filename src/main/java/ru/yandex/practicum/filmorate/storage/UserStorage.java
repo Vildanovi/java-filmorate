@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface UserStorage {
 
-    void addUser(User user);
+    User addUser(User user);
 
     void removeUser(int id);
 

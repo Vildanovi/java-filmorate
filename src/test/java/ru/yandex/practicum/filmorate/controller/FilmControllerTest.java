@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmMpaRating;
 import ru.yandex.practicum.filmorate.service.FilmDbService;
 
 import javax.validation.ConstraintViolation;
@@ -56,6 +57,10 @@ public class FilmControllerTest extends FilmController {
                 .name("")
                 .description("Description")
                 .releaseDate(LocalDate.of(1900,03,25))
+                .mpa(FilmMpaRating.builder()
+                        .id(1)
+                        .name("mpa")
+                        .build())
                 .duration(200)
                 .build();
 
@@ -69,6 +74,10 @@ public class FilmControllerTest extends FilmController {
                 .name("Name")
                 .description("Description")
                 .releaseDate(LocalDate.of(1894,10,25))
+                .mpa(FilmMpaRating.builder()
+                        .id(1)
+                        .name("mpa")
+                        .build())
                 .duration(200)
                 .build();
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
@@ -84,6 +93,10 @@ public class FilmControllerTest extends FilmController {
                         "а именно 20 миллионов. о Куглов, который за время «своего отсутствия», " +
                         "стал кандидатом Коломбани.")
                 .releaseDate(LocalDate.of(1900,3,25))
+                .mpa(FilmMpaRating.builder()
+                        .id(1)
+                        .name("mpa")
+                        .build())
                 .duration(200)
                 .build();
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
@@ -96,6 +109,10 @@ public class FilmControllerTest extends FilmController {
                 .name("Film name")
                 .description("Description")
                 .releaseDate(LocalDate.of(1900,3,25))
+                .mpa(FilmMpaRating.builder()
+                        .id(1)
+                        .name("mpa")
+                        .build())
                 .duration(-200)
                 .build();
         Set<ConstraintViolation<Film>> violations = validator.validate(film);

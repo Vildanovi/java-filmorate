@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.service.FilmDbService;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -52,14 +51,14 @@ public class FilmController {
 
     @Operation(summary = "Пользователь ставит лайк фильму.")
     @PutMapping("/{id}/like/{userId}")
-    public Optional<Film> addLike(@PathVariable ("id") int id, @PathVariable ("userId") int userId) {
+    public Film addLike(@PathVariable ("id") int id, @PathVariable ("userId") int userId) {
         log.debug("Ставим лайк фильму с id: {}", id);
         return filmService.addLike(id, userId);
     }
 
     @Operation(summary = "Пользователь удаляет лайк.")
     @DeleteMapping("/{id}/like/{userId}")
-    public Optional<Film> deleteLike(@PathVariable ("id") int id, @PathVariable ("userId") int userId) {
+    public Film deleteLike(@PathVariable ("id") int id, @PathVariable ("userId") int userId) {
         log.debug("Удаляем лайк фильма с id: {}", id);
         return filmService.deleteLike(id, userId);
     }

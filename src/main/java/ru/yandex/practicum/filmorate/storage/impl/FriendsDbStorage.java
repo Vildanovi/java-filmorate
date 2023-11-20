@@ -2,16 +2,11 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.UserFriends;
 import ru.yandex.practicum.filmorate.storage.FriendsStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -22,29 +17,21 @@ public class FriendsDbStorage implements FriendsStorage {
 
     private final Logger log = LoggerFactory.getLogger(FilmDbStorage.class);
     private final JdbcTemplate jdbcTemplate;
-    private final UserStorage userStorage;
 
-    public FriendsDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("userDbStorage") UserStorage userStorage) {
+    public FriendsDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.userStorage = userStorage;
     }
 
     @Override
-    public List<User> getAllFriendsById(int id) {
+    public List<UserFriends> getAllFriendsById(int id) {
         String userFriendsSql = "SELECT f2.id, f2.user1_id, f2.user2_id, f2.initiator_id \n" +
                 "FROM user_friends as f2\n" +
                 "WHERE f2.user1_id = ?;";
         List<UserFriends> userFriends = jdbcTemplate.query(userFriendsSql, (rs, rowNum) -> makeFriends(rs), id);
-        List<User> friends = userFriends.stream()
-                .map(UserFriends::getUser2Id)
-                .map(userStorage::getUserByID)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-        if (friends.isEmpty()) {
+        if (userFriends.isEmpty()) {
             return Collections.emptyList();
         }
-        return friends;
+        return userFriends;
     }
 
     @Override
@@ -77,16 +64,15 @@ public class FriendsDbStorage implements FriendsStorage {
     }
 
     @Override
-    public List<User> getCommonFriends(Integer userId, Integer friendId) {
+    public List<Integer> getCommonFriends(Integer userId, Integer friendId) {
         SqlRowSet sqlCommon = jdbcTemplate.queryForRowSet("SELECT f1.user2_id " +
                 "FROM user_friends AS f1 " +
                 "INNER JOIN user_friends AS f2 ON f1.user2_id = f2.user2_id " +
                 "WHERE f1.user1_id = ? AND f2.user1_id = ?;", userId, friendId);
-        List<User> commonUsers = new ArrayList<>();
+        List<Integer> commonUsers = new ArrayList<>();
         while (sqlCommon.next()) {
             int id = sqlCommon.getInt("user2_id");
-            commonUsers.add(userStorage.getUserByID(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + id)));
+            commonUsers.add(id);
         }
         return commonUsers;
     }

@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationBadRequestException;
@@ -22,18 +21,16 @@ import java.util.Set;
 @Service
 public class FilmDbService {
 
-    private int uniqueId = 0;
     private final FilmStorage filmDbStorage;
     private final UserStorage userDbStorage;
     private final GenreStorage genreStorage;
-
     private final MpaStorage mpaStorage;
 
     @Autowired
-    public FilmDbService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                         @Qualifier("userDbStorage") UserStorage userStorage,
-                         @Qualifier("genreDbStorage") GenreStorage genreStorage,
-                         @Qualifier("mpaDbStorage") MpaStorage mpaStorage) {
+    public FilmDbService(FilmStorage filmStorage,
+                         UserStorage userStorage,
+                         GenreStorage genreStorage,
+                         MpaStorage mpaStorage) {
         this.filmDbStorage = filmStorage;
         this.userDbStorage = userStorage;
         this.genreStorage = genreStorage;
@@ -44,9 +41,10 @@ public class FilmDbService {
         if (film == null) {
             throw new EntityNotFoundException("Необходимо передать параметры фильма");
         }
-        film.setId(getUniqueId());
         Film newFilm = filmDbStorage.addFilm(film);
-        newFilm.setGenres(genreStorage.getFilmGenre(film.getId()));
+        if (film.getGenres() != null) {
+            genreStorage.addGenre(newFilm);
+        }
         return newFilm;
     }
 
@@ -63,6 +61,9 @@ public class FilmDbService {
         if (updatedFilm.isPresent()) {
             genreStorage.deleteGenres(filmId);
             filmDbStorage.updateFilm(film);
+            if (film.getGenres() != null) {
+                genreStorage.addGenre(film);
+            }
         } else {
             throw new EntityNotFoundException("Фильм с указанным id не найден: " + filmId);
         }
@@ -99,13 +100,13 @@ public class FilmDbService {
         return film;
     }
 
-    public Optional<Film> addLike(int filmId, int userId) {
+    public Film addLike(int filmId, int userId) {
         filmDbStorage.getFilmByID(filmId);
         userDbStorage.getUserByID(userId);
         return filmDbStorage.addLike(filmId, userId);
     }
 
-    public Optional<Film> deleteLike(int filmId, int userId) {
+    public Film deleteLike(int filmId, int userId) {
         filmDbStorage.getFilmByID(filmId)
                 .orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + filmId));
         userDbStorage.getUserByID(userId)
@@ -121,9 +122,5 @@ public class FilmDbService {
         } else {
             throw new ValidationBadRequestException("Список фильмов пуст");
         }
-    }
-
-    private int getUniqueId() {
-        return ++uniqueId;
     }
 }

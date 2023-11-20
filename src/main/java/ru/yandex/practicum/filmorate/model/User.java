@@ -23,6 +23,5 @@ public class User {
     @NotNull (message = "Дата рождения не может быть пустым")
     @PastOrPresent (message = "Дата рождения не может быть позже текущей")
     private LocalDate birthday;// дата рождения — birthday
-//    @JsonIgnore
     private Set<Integer> friends = new HashSet<>(); //id друзей
 }

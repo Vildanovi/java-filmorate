@@ -6,7 +6,6 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @Builder
-//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FilmMpaRating {
 
     private int id; // Идентификатор
