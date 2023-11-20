@@ -131,7 +131,7 @@ public class FilmControllerTest extends FilmController {
     }
 
     @Test
-    public void addFilm() throws IOException, InterruptedException {
+    public void getFilms() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/films"))

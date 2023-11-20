@@ -59,9 +59,10 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public Set<Genre> getFilmGenre(int id) {
-        String genresFilm = "select * from GENRE JOIN film_genre ON genre_id = GENRE.ID where film_genre.FILM_ID = ?";
+        String genresFilm = "select * from film_genre as fg LEFT JOIN GENRE as g ON fg.GENRE_ID = g.ID where fg.FILM_ID = ?";
         return new HashSet<>(jdbcTemplate.query(genresFilm, GenreDbStorage::makeGenre, id));
     }
+
 
     @Override
     public void deleteGenres(int filmId) {

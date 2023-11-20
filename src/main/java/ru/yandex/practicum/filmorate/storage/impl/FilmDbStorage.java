@@ -120,22 +120,6 @@ public class FilmDbStorage implements FilmStorage {
         return new HashSet<>(jdbcTemplate.query(genresFilm, GenreDbStorage::makeGenre, id));
     }
 
-    public Set<Genre> getFilmGenres(int filmId) {
-        String sqlQuery = "SELECT fg.film_id, fg.genre_id, g.name " +
-                "FROM film_genre fg " +
-                "LEFT JOIN genre g ON fg.genre_id = g.id " +
-                "WHERE fg.film_id = ? " +
-                "ORDER BY fg.genre_id";
-        return new HashSet<>(jdbcTemplate.query(sqlQuery, this::makeGenre, filmId));
-    }
-
-    private Genre makeGenre(ResultSet rs, int rowNum) throws SQLException {
-        return Genre.builder()
-                .id(rs.getInt("genre_id"))
-                .name(rs.getString("genre_name"))
-                .build();
-    }
-
     private FilmMpaRating getMpaRating(int mpaId, String mpaName) {
         return  FilmMpaRating.builder()
                 .id(mpaId)
