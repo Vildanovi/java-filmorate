@@ -15,6 +15,9 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.function.UnaryOperator.identity;
 
 @Component
 @RequiredArgsConstructor
@@ -71,6 +74,25 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public void load(List<Film> films) {
+        final Map<Integer, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
+        String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
+
+        final String sqlQuery = "select * from GENRE as g, FILM_GENRE as fg where fg.GENRE_ID = g.ID AND fg.FILM_ID in (" + inSql + ")";
+        jdbcTemplate.query(sqlQuery, (rs) -> {
+            final Film film = filmById.get(rs.getInt("FILM_ID"));
+            film.getGenres().add(makeGenre(rs));
+        }, films.stream().map(Film::getId).toArray());
+    }
+
+    private Genre makeGenre(ResultSet rs) throws SQLException {
+        return Genre.builder()
+                .id(rs.getInt("id"))
+                .name(rs.getString("name"))
+                .build();
+    }
+
+    @Override
     public Optional<Film> getFilmByID(int id) {
         String sqlQuery = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.rating_mpa_id, fmr.name as mpa_name " +
                 "FROM films f " +
@@ -109,7 +131,6 @@ public class FilmDbStorage implements FilmStorage {
                 .description(rs.getString("description"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
-                .likes(getLikesById(rs.getInt("id")))
                 .mpa(getMpaRating(rs.getInt("rating_mpa_id"), rs.getString("mpa_name")))
                 .genres(new HashSet<>())
                 .build();
@@ -148,4 +169,6 @@ public class FilmDbStorage implements FilmStorage {
         }
         return filmLikes;
     }
+
+
 }

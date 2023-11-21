@@ -11,13 +11,11 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenreDbService;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
 @RequestMapping("/genres")
 @RequiredArgsConstructor
-//@Validated
 public class GenreController {
 
     private final GenreDbService service;
@@ -31,7 +29,7 @@ public class GenreController {
 
     @Operation(summary = "Получение жанра по id")
     @GetMapping("/{id}")
-    public Optional<Genre> getGenre(@PathVariable("id") int id) {
+    public Genre getGenre(@PathVariable("id") int id) {
         log.debug("Получаем жанр с id: {}", id);
         return service.getGenreByID(id);
     }

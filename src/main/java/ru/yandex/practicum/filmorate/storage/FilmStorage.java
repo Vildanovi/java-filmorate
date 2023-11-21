@@ -15,6 +15,8 @@ public interface FilmStorage {
 
     List<Film> getAll();
 
+    void load(List<Film> films);
+
     Optional<Film> getFilmByID(int id);
 
     Film addLike(int filmId, int userId);

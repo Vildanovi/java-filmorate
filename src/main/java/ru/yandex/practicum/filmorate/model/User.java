@@ -3,8 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.*;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @AllArgsConstructor
 @Builder
@@ -23,5 +21,4 @@ public class User {
     @NotNull (message = "Дата рождения не может быть пустым")
     @PastOrPresent (message = "Дата рождения не может быть позже текущей")
     private LocalDate birthday;// дата рождения — birthday
-    private Set<Integer> friends = new HashSet<>(); //id друзей
 }

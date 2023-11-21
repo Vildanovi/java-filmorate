@@ -8,10 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.impl.UserDbStorage;
-
 import java.time.LocalDate;
-import java.util.HashSet;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @JdbcTest // указываем, о необходимости подготовить бины для работы с БД
@@ -27,7 +24,6 @@ class UserDbStorageTest {
                 .name("Nick Name")
                 .email("mail2@mail.ru")
                 .birthday(LocalDate.of(1946,8,20))
-                .friends(new HashSet<>())
                 .build();
         UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
         userStorage.addUser(user1);

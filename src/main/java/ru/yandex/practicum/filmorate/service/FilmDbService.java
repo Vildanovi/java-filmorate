@@ -13,9 +13,7 @@ import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -72,17 +70,7 @@ public class FilmDbService {
 
     public List<Film> getAll() {
         List<Film> allFilm = filmDbStorage.getAll();
-        for (Film film : allFilm) {
-            int id = film.getId();
-            FilmMpaRating mpa = mpaStorage.getMpaByFilmId(id);
-            Set<Genre> genres = genreStorage.getFilmGenre(id);
-            if (mpa != null) {
-                film.setMpa(mpa);
-            }
-            if (genres != null) {
-                film.setGenres(genres);
-            }
-        }
+        filmDbStorage.load(allFilm);
         return allFilm;
     }
 

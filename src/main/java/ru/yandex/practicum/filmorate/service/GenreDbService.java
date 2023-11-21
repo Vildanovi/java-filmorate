@@ -2,11 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class GenreDbService {
@@ -22,7 +22,8 @@ public class GenreDbService {
         return genreStorage.getAll();
     }
 
-    public Optional<Genre> getGenreByID(int id) {
-        return genreStorage.getGenreByID(id);
+    public Genre getGenreByID(int id) {
+        return genreStorage.getGenreByID(id)
+                .orElseThrow(() -> new EntityNotFoundException("Жанр с указанным id не найден: " + id));
     }
 }

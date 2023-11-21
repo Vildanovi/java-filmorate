@@ -80,7 +80,6 @@ public class UserDbStorage implements UserStorage {
                 .login(rs.getString("login"))
                 .name(rs.getString("name"))
                 .birthday(rs.getDate("birthday").toLocalDate())
-                .friends(new HashSet<>())
                 .build();
     }
 }

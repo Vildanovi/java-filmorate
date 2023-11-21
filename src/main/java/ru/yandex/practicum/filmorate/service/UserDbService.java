@@ -5,12 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.UserFriends;
 import ru.yandex.practicum.filmorate.storage.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -82,32 +79,13 @@ public class UserDbService {
     }
 
     public List<User> getUserFriendsDb(int id) {
-        List<UserFriends> userFriends = friendsStorage.getAllFriendsById(id);
-        List<User> friends = userFriends.stream()
-                .map(UserFriends::getUser2Id)
-                .map(userDbStorage::getUserByID)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-        if (friends.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return friends;
+        return friendsStorage.getAllFriendsById(id);
     }
 
     public List<User> getCommonFriendsDb(int id, int otherId) {
         getUserByIdDb(id);
         getUserByIdDb(otherId);
-        List<Integer> commonUsersId = friendsStorage.getCommonFriends(id, otherId);
-        List<User> commonUsers = commonUsersId.stream()
-                .map(userDbStorage::getUserByID)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-        if (commonUsers.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return commonUsers;
+        return friendsStorage.getCommonFriends(id, otherId);
     }
 
     public User getUserByIdDb(int id) {

@@ -28,7 +28,7 @@ public class FilmDbStorageTest {
                         .id(1)
                         .name("G")
                         .build())
-                .likes(new HashSet<>())
+//                .likes(new HashSet<>())
                 .genres(new HashSet<>())
                 .duration(200)
                 .build();

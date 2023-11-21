@@ -33,7 +33,7 @@ public class GenreDbStorageTest {
                         .id(1)
                         .name("G")
                         .build())
-                .likes(new HashSet<>())
+//                .likes(new HashSet<>())
                 .genres(filmGenre)
                 .duration(200)
                 .build();

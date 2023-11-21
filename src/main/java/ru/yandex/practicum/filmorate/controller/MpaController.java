@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/mpa")
 @RequiredArgsConstructor
-//@Validated
 public class MpaController {
 
     private final MpaDbService service;
