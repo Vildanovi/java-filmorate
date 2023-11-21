@@ -28,15 +28,15 @@ public class FilmDbStorageTest {
                         .id(1)
                         .name("G")
                         .build())
-//                .likes(new HashSet<>())
                 .genres(new HashSet<>())
                 .duration(200)
                 .build();
         FilmDbStorage filmDbStorage = new FilmDbStorage(jdbcTemplate);
-        filmDbStorage.addFilm(film1);
+        Film newFilm = filmDbStorage.addFilm(film1);
+        int id = newFilm.getId();
 
 
-        Film savedFilm = filmDbStorage.getFilmByID(1).orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + 1));
+        Film savedFilm = filmDbStorage.getFilmByID(id).orElseThrow(() -> new EntityNotFoundException("Фильм с указанным id не найден: " + id));
 
         assertThat(savedFilm)
                 .isNotNull()

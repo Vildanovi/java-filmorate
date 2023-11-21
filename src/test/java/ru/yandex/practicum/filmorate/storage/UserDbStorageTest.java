@@ -26,10 +26,11 @@ class UserDbStorageTest {
                 .birthday(LocalDate.of(1946,8,20))
                 .build();
         UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
-        userStorage.addUser(user1);
+        User newUser = userStorage.addUser(user1);
+        int id = newUser.getId();
 
         // вызываем тестируемый метод
-        User savedUser = userStorage.getUserByID(1).orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не найден: " + 1));
+        User savedUser = userStorage.getUserByID(id).orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным id не найден: " + id));
 
         // проверяем утверждения
         assertThat(savedUser)
