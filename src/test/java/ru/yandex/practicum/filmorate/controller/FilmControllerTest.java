@@ -5,9 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.exceptions.ValidationBadRequestException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.model.FilmMpaRating;
+import ru.yandex.practicum.filmorate.service.FilmDbService;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -26,22 +27,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class FilmControllerTest extends FilmController {
 
-    FilmController filmController;
     HttpClient client;
 
     @Autowired
     private ObjectMapper objectMapper;
     private Validator validator;
-    private FilmService filmService;
+
+    private FilmDbService filmService;
 
     @Autowired
-    public FilmControllerTest(FilmService filmService) {
+    JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public FilmControllerTest(FilmDbService filmService) {
         super(filmService);
     }
 
     @BeforeEach
     void beforeEach() {
-        filmController = new FilmControllerTest(filmService);
         client = HttpClient.newHttpClient();
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -50,12 +53,16 @@ public class FilmControllerTest extends FilmController {
 
     @Test
     public void validationFilmEmptyName() {
-        Film film = new Film();
-        film.setName("");
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.of(1900,03,25));
-        film.setDuration(200);
-
+        Film film = Film.builder()
+                .name("")
+                .description("Description")
+                .releaseDate(LocalDate.of(1900,03,25))
+                .mpa(FilmMpaRating.builder()
+                        .id(1)
+                        .name("mpa")
+                        .build())
+                .duration(200)
+                .build();
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size());
@@ -63,36 +70,51 @@ public class FilmControllerTest extends FilmController {
 
     @Test
     public void validationFilmReleaseDate() {
-        Film film = new Film();
-        film.setName("Name");
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.of(1894,10,25));
-        film.setDuration(200);
+        Film film = Film.builder()
+                .name("Name")
+                .description("Description")
+                .releaseDate(LocalDate.of(1894,10,25))
+                .mpa(FilmMpaRating.builder()
+                        .id(1)
+                        .name("mpa")
+                        .build())
+                .duration(200)
+                .build();
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size());
     }
 
     @Test
     public void validationFilmDescription() {
-        Film film = new Film();
-        film.setName("Name");
-        film.setDescription("Пятеро друзей ( комик-группа «Шарло»), приезжают в город Бризуль. " +
-                "Здесь они хотят разыскать господина Огюста Куглова, который задолжал им деньги, " +
-                "а именно 20 миллионов. о Куглов, который за время «своего отсутствия», " +
-                "стал кандидатом Коломбани.");
-        film.setReleaseDate(LocalDate.of(1900,3,25));
-        film.setDuration(200);
+        Film film = Film.builder()
+                .name("Name")
+                .description("Пятеро друзей ( комик-группа «Шарло»), приезжают в город Бризуль. " +
+                        "Здесь они хотят разыскать господина Огюста Куглова, который задолжал им деньги, " +
+                        "а именно 20 миллионов. о Куглов, который за время «своего отсутствия», " +
+                        "стал кандидатом Коломбани.")
+                .releaseDate(LocalDate.of(1900,3,25))
+                .mpa(FilmMpaRating.builder()
+                        .id(1)
+                        .name("mpa")
+                        .build())
+                .duration(200)
+                .build();
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size());
     }
 
     @Test
     public void validationFilmDuration() {
-        Film film = new Film();
-        film.setName("Film name");
-        film.setDescription("Description");
-        film.setReleaseDate(LocalDate.of(1900,3,25));
-        film.setDuration(-200);
+        Film film = Film.builder()
+                .name("Film name")
+                .description("Description")
+                .releaseDate(LocalDate.of(1900,3,25))
+                .mpa(FilmMpaRating.builder()
+                        .id(1)
+                        .name("mpa")
+                        .build())
+                .duration(-200)
+                .build();
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size());
     }
@@ -109,61 +131,11 @@ public class FilmControllerTest extends FilmController {
     }
 
     @Test
-    public void addFilm() throws IOException, InterruptedException {
+    public void getFilms() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/films"))
                 .GET()
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode());
-    }
-
-    @Test
-    public void updateFilm() throws ValidationBadRequestException, IOException, InterruptedException {
-        Film film1 = new Film();
-        film1.setName("name");
-        film1.setDescription("adipisicing");
-        film1.setReleaseDate(LocalDate.of(1967,3,25));
-        film1.setDuration(100);
-
-        String json = objectMapper.writeValueAsString(film1);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/films"))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        Film film2 = new Film();
-        film2.setId(1);
-        film2.setName("name");
-        film2.setDescription("adipisicing");
-        film2.setReleaseDate(LocalDate.of(1967,3,25));
-        film2.setDuration(100);
-        String json2 = objectMapper.writeValueAsString(film2);
-        HttpRequest request2 = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/films"))
-                .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(json2))
-                .build();
-        HttpResponse<String> response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode());
-        assertEquals(200, response2.statusCode());
-    }
-
-    @Test
-    public void createTrueFilm() throws IOException, InterruptedException {
-        Film film1 = new Film();
-        film1.setName("name");
-        film1.setDescription("adipisicing");
-        film1.setReleaseDate(LocalDate.of(1967,3,25));
-        film1.setDuration(100);
-
-        String json = objectMapper.writeValueAsString(film1);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/films"))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());

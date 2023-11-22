@@ -6,7 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.FilmDbService;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
@@ -18,26 +19,27 @@ import java.util.List;
 @Validated
 public class FilmController {
 
-    private final FilmService filmService;
+    private final FilmDbService filmService;
 
     @Operation(summary = "Получить все фильмы")
-    @GetMapping()
+    @GetMapping
     public List<Film> getAllFilms() {
-        return filmService.getFilms();
+
+        return filmService.getAll();
     }
 
     @Operation(summary = "Получение фильма по id")
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable ("id") int id) {
-        log.debug("Получаем пользователя с id: {}", id);
-        return filmService.getFilmById(id);
+        log.debug("Получаем фильм с id: {}", id);
+        return filmService.getFilmByID(id);
     }
 
     @Operation(summary = "Добавление фильма")
     @PostMapping
     public Film postFilm(@Valid @RequestBody Film film) {
         log.debug("Сохраняем фильм {}", film);
-        return filmService.createFilm(film);
+        return filmService.addFilm(film);
     }
 
     @Operation(summary = "Обновление фильма")

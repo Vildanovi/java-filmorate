@@ -1,14 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.interfaces.MinimumDate;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
+@Builder
 public class Film {
 
     private int id; // целочисленный идентификатор
@@ -21,6 +21,7 @@ public class Film {
     private LocalDate releaseDate; // дата релиза
     @Positive(message = "Продолжительность не может быть меньше 0")
     private int duration; // продолжительность фильма
-    @JsonIgnore
-    private Set<Integer> likes = new HashSet<>(); //id пользователей кто поставил лайк
+    @NotNull
+    private FilmMpaRating mpa; //Возрастной рейтинг контента
+    private Set<Genre> genres = new HashSet<>(); // id жанров
 }
